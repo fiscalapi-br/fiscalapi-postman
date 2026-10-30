@@ -18,10 +18,10 @@ O uso pela API exige um plano ativo ou créditos. Planos, limites e consumo de c
 
 ## SDKs
 
-- Python: [fiscalapi-python](https://github.com/fiscaIapi/fiscalapi-python)
-- Node.js / TypeScript: [fiscalapi-node](https://github.com/fiscaIapi/fiscalapi-node)
-- PHP: [fiscalapi-php](https://github.com/fiscaIapi/fiscalapi-php)
-- n8n: [n8n-nodes-fiscalapi](https://github.com/fiscaIapi/n8n-nodes-fiscalapi)
+- Python: [fiscalapi-python](https://github.com/fiscalapi-br/fiscalapi-python)
+- Node.js / TypeScript: [fiscalapi-node](https://github.com/fiscalapi-br/fiscalapi-node)
+- PHP: [fiscalapi-php](https://github.com/fiscalapi-br/fiscalapi-php)
+- n8n: [n8n-nodes-fiscalapi](https://github.com/fiscalapi-br/n8n-nodes-fiscalapi)
 
 ## Licença
 
