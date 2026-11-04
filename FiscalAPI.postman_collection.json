@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "a502c70e-5ed7-54dd-9642-eda948b8f723",
     "name": "FiscalAPI",
-    "description": "API REST de consultas fiscais e cadastrais do Brasil, com foco no agronegócio: inscrição estadual nas 27 UFs, CNPJ, certidões estaduais e federais, XML de NF-e por chave, imóveis rurais (SIGEF e CNIR) e perfil consolidado do produtor rural. Respostas em JSON.\n\n**Autenticação:** envie sua chave no header `X-API-Key` (formato `fapi_...`). Crie a conta e copie a chave em https://app.fiscalapi.com.br. Nunca exponha a chave no front-end.\n\n**Cobrança:** cada consulta com dado consome créditos do plano (1 na maioria; 3 no CNPJ ao vivo; NF-e conforme o plano). Erros não são cobrados. Erros da origem do dado vêm com HTTP 200 em `source_status` (também não cobrados).\n\n**Limites:** franquia mensal por conta e limite de requisições por minuto conforme o plano (Lite 5, Starter 20, Pro 60, Enterprise 120). Ao exceder: HTTP 402 `LIMITE_ATINGIDO` (saldo) ou HTTP 429 `RATE_LIMIT_EXCEEDED` (com `Retry-After`).\n\n**Erros:** formato RFC 7807 (`application/problem+json`) com `title` = código do erro e `request_id` para o suporte.\n\nDocumentação completa: https://docs.fiscalapi.com.br\n\n## Como usar\n1. Em **Variables** da coleção, cole sua chave em `apiKey` (fica só no seu Postman).\n2. Abra uma pasta, escolha a requisição e clique em **Send**.\n3. Veja respostas de exemplo em **Examples** de cada requisição.\n\nOs exemplos usam o CNPJ público da Petrobras (33.000.167/0001-01) e dados fictícios nas respostas salvas.",
+    "description": "API REST de consultas fiscais e cadastrais do Brasil, com foco no agronegócio: inscrição estadual nas 27 UFs, CNPJ, certidões estaduais e federais, XML de NF-e por chave, imóveis rurais (SIGEF e CNIR) e perfil consolidado do produtor rural. Respostas em JSON.\n\n**Autenticação:** envie sua chave no header `X-API-Key` (formato `fapi_...`). Crie a conta e copie a chave em https://app.fiscalapi.com.br. Nunca exponha a chave no front-end.\n\n**Cobrança:** cada consulta com dado consome créditos do plano (1 na maioria; 3 no CNPJ ao vivo; NF-e conforme o plano). Erros não são cobrados. Erros da origem do dado vêm com HTTP 200 em `source_status` (também não cobrados).\n\n**Limites:** franquia mensal por conta e limite de requisições por minuto conforme o plano (Lite 5, Starter 20, Pro 60, Enterprise 120). Ao exceder: HTTP 402 `LIMITE_ATINGIDO` (saldo) ou HTTP 429 `RATE_LIMIT_EXCEEDED` (com `Retry-After`).\n\n**Erros:** formato RFC 7807 (`application/problem+json`) com `title` = código do erro e `request_id` para o suporte.\n\nDocumentação completa: https://docs.fiscalapi.com.br\n\n## Como usar\n1. Em **Variables** da coleção, cole sua chave em `apiKey` (fica só no seu Postman).\n2. Abra uma pasta, escolha a requisição e clique em **Send**.\n3. Veja respostas de exemplo em **Examples** de cada requisição.\n\nOs exemplos usam documentos fictícios (CNPJ 12.345.678/0001-95). Troque pelo documento que você quer consultar.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -72,7 +72,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/consultar?uf=RJ&cnpj=33000167000101",
+              "raw": "{{baseUrl}}/api/consultar?uf=RJ&cnpj=12345678000195",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -87,7 +87,7 @@
                 },
                 {
                   "key": "cnpj",
-                  "value": "33000167000101"
+                  "value": "12345678000195"
                 }
               ]
             },
@@ -105,7 +105,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/consultar?uf=MT&cpf=12345678900",
+                  "raw": "{{baseUrl}}/api/consultar?uf=MT&cpf=12345678909",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -120,7 +120,7 @@
                     },
                     {
                       "key": "cpf",
-                      "value": "12345678900"
+                      "value": "12345678909"
                     }
                   ]
                 }
@@ -135,7 +135,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"document\": \"12345678900\",\n  \"document_type\": \"cpf\",\n  \"uf\": \"MT\",\n  \"cached\": false,\n  \"demo\": false,\n  \"results\": [\n    {\n      \"inscricao_estadual\": \"13.123.456-7\",\n      \"razao_social\": \"JOAO DA SILVA FAZENDA SANTA MARIA\",\n      \"nome_fantasia\": \"FAZENDA SANTA MARIA\",\n      \"situacao_ie\": \"ATIVA\",\n      \"uf_ie\": \"MT\",\n      \"tipo_ie\": \"PRODUTOR RURAL\",\n      \"logradouro\": \"ROD MT-130 KM 42\",\n      \"complemento\": \"ZONA RURAL\",\n      \"bairro\": \"ZONA RURAL\",\n      \"numero\": \"S/N\",\n      \"municipio\": \"RONDONOPOLIS\",\n      \"municipio_ibge\": \"5107602\",\n      \"cep\": \"78700-000\",\n      \"regime_pagamento\": \"NORMAL\",\n      \"data_situacao\": \"15/03/2020\",\n      \"situacao_contribuinte\": \"ATIVO\",\n      \"data_inicio_atividade\": \"01/06/2015\",\n      \"cnae_codigo\": \"0111301\",\n      \"cnae_descricao\": \"CULTIVO DE ARROZ\",\n      \"regime_apuracao_icms\": \"NORMAL\",\n      \"situacao_nfe\": \"HABILITADO\",\n      \"cpf_cnpj\": \"123.456.789-00\",\n      \"situacao_cadastral\": \"ATIVA\",\n      \"cnaes_secundarios\": [\n        {\n          \"codigo\": \"0111302\",\n          \"descricao\": \"CULTIVO DE MILHO\"\n        }\n      ],\n      \"data_situacao_iso\": \"2020-03-15\",\n      \"data_inicio_atividade_iso\": \"2015-06-01\"\n    }\n  ]\n}"
+              "body": "{\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"document\": \"12345678909\",\n  \"document_type\": \"cpf\",\n  \"uf\": \"MT\",\n  \"cached\": false,\n  \"demo\": false,\n  \"results\": [\n    {\n      \"inscricao_estadual\": \"13.123.456-7\",\n      \"razao_social\": \"JOAO DA SILVA FAZENDA SANTA MARIA\",\n      \"nome_fantasia\": \"FAZENDA SANTA MARIA\",\n      \"situacao_ie\": \"ATIVA\",\n      \"uf_ie\": \"MT\",\n      \"tipo_ie\": \"PRODUTOR RURAL\",\n      \"logradouro\": \"ROD MT-130 KM 42\",\n      \"complemento\": \"ZONA RURAL\",\n      \"bairro\": \"ZONA RURAL\",\n      \"numero\": \"S/N\",\n      \"municipio\": \"RONDONOPOLIS\",\n      \"municipio_ibge\": \"5107602\",\n      \"cep\": \"78700-000\",\n      \"regime_pagamento\": \"NORMAL\",\n      \"data_situacao\": \"15/03/2020\",\n      \"situacao_contribuinte\": \"ATIVO\",\n      \"data_inicio_atividade\": \"01/06/2015\",\n      \"cnae_codigo\": \"0111301\",\n      \"cnae_descricao\": \"CULTIVO DE ARROZ\",\n      \"regime_apuracao_icms\": \"NORMAL\",\n      \"situacao_nfe\": \"HABILITADO\",\n      \"cpf_cnpj\": \"123.456.789-00\",\n      \"situacao_cadastral\": \"ATIVA\",\n      \"cnaes_secundarios\": [\n        {\n          \"codigo\": \"0111302\",\n          \"descricao\": \"CULTIVO DE MILHO\"\n        }\n      ],\n      \"data_situacao_iso\": \"2020-03-15\",\n      \"data_inicio_atividade_iso\": \"2015-06-01\"\n    }\n  ]\n}"
             },
             {
               "name": "400 - PARAMETRO_AUSENTE",
@@ -187,7 +187,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/consultar?uf=MT&cpf=12345678900",
+                  "raw": "{{baseUrl}}/api/consultar?uf=MT&cpf=12345678909",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -202,7 +202,7 @@
                     },
                     {
                       "key": "cpf",
-                      "value": "12345678900"
+                      "value": "12345678909"
                     }
                   ]
                 }
@@ -230,7 +230,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/consultar?uf=MT&cpf=12345678900",
+                  "raw": "{{baseUrl}}/api/consultar?uf=MT&cpf=12345678909",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -245,7 +245,7 @@
                     },
                     {
                       "key": "cpf",
-                      "value": "12345678900"
+                      "value": "12345678909"
                     }
                   ]
                 }
@@ -273,7 +273,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/consultar?uf=MT&cpf=12345678900",
+                  "raw": "{{baseUrl}}/api/consultar?uf=MT&cpf=12345678909",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -288,7 +288,7 @@
                     },
                     {
                       "key": "cpf",
-                      "value": "12345678900"
+                      "value": "12345678909"
                     }
                   ]
                 }
@@ -330,7 +330,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/consultar-ie-todos?cnpj=33000167000101",
+              "raw": "{{baseUrl}}/api/consultar-ie-todos?cnpj=12345678000195",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -341,7 +341,7 @@
               "query": [
                 {
                   "key": "cnpj",
-                  "value": "33000167000101"
+                  "value": "12345678000195"
                 }
               ]
             },
@@ -359,7 +359,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/consultar-ie-todos?cpf=12345678900",
+                  "raw": "{{baseUrl}}/api/consultar-ie-todos?cpf=12345678909",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -370,7 +370,7 @@
                   "query": [
                     {
                       "key": "cpf",
-                      "value": "12345678900"
+                      "value": "12345678909"
                     }
                   ]
                 }
@@ -385,7 +385,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"document\": \"12345678900\",\n  \"document_type\": \"cpf\",\n  \"cached_ufs\": [],\n  \"results\": [\n    {\n      \"uf\": \"MT\",\n      \"source_status\": {\n        \"status\": \"success\",\n        \"error_code\": \"\",\n        \"error_message\": \"\"\n      },\n      \"results\": [\n        {\n          \"inscricao_estadual\": \"13.123.456-7\",\n          \"razao_social\": \"JOAO DA SILVA FAZENDA SANTA MARIA\",\n          \"situacao_ie\": \"ATIVA\",\n          \"uf_ie\": \"MT\",\n          \"tipo_ie\": \"PRODUTOR RURAL\",\n          \"municipio\": \"RONDONOPOLIS\",\n          \"cnae_codigo\": \"0111301\",\n          \"cnae_descricao\": \"CULTIVO DE ARROZ\",\n          \"cnaes_secundarios\": [\n            {\n              \"codigo\": \"0111302\",\n              \"descricao\": \"CULTIVO DE MILHO\"\n            }\n          ]\n        }\n      ]\n    },\n    {\n      \"uf\": \"GO\",\n      \"source_status\": {\n        \"status\": \"success\",\n        \"error_code\": \"\",\n        \"error_message\": \"\"\n      },\n      \"results\": []\n    },\n    {\n      \"uf\": \"RO\",\n      \"source_status\": {\n        \"status\": \"success\",\n        \"error_code\": \"\",\n        \"error_message\": \"\"\n      },\n      \"results\": []\n    }\n  ],\n  \"complete\": true\n}"
+              "body": "{\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"document\": \"12345678909\",\n  \"document_type\": \"cpf\",\n  \"cached_ufs\": [],\n  \"results\": [\n    {\n      \"uf\": \"MT\",\n      \"source_status\": {\n        \"status\": \"success\",\n        \"error_code\": \"\",\n        \"error_message\": \"\"\n      },\n      \"results\": [\n        {\n          \"inscricao_estadual\": \"13.123.456-7\",\n          \"razao_social\": \"JOAO DA SILVA FAZENDA SANTA MARIA\",\n          \"situacao_ie\": \"ATIVA\",\n          \"uf_ie\": \"MT\",\n          \"tipo_ie\": \"PRODUTOR RURAL\",\n          \"municipio\": \"RONDONOPOLIS\",\n          \"cnae_codigo\": \"0111301\",\n          \"cnae_descricao\": \"CULTIVO DE ARROZ\",\n          \"cnaes_secundarios\": [\n            {\n              \"codigo\": \"0111302\",\n              \"descricao\": \"CULTIVO DE MILHO\"\n            }\n          ]\n        }\n      ]\n    },\n    {\n      \"uf\": \"GO\",\n      \"source_status\": {\n        \"status\": \"success\",\n        \"error_code\": \"\",\n        \"error_message\": \"\"\n      },\n      \"results\": []\n    },\n    {\n      \"uf\": \"RO\",\n      \"source_status\": {\n        \"status\": \"success\",\n        \"error_code\": \"\",\n        \"error_message\": \"\"\n      },\n      \"results\": []\n    }\n  ],\n  \"complete\": true\n}"
             },
             {
               "name": "400 - PARAMETRO_AUSENTE",
@@ -439,7 +439,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/consultar-cnpj?cnpj=33000167000101",
+              "raw": "{{baseUrl}}/api/consultar-cnpj?cnpj=12345678000195",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -450,7 +450,7 @@
               "query": [
                 {
                   "key": "cnpj",
-                  "value": "33000167000101"
+                  "value": "12345678000195"
                 }
               ]
             },
@@ -468,7 +468,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/consultar-cnpj?cnpj=12345678000199",
+                  "raw": "{{baseUrl}}/api/consultar-cnpj?cnpj=12345678000195",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -479,7 +479,7 @@
                   "query": [
                     {
                       "key": "cnpj",
-                      "value": "12345678000199"
+                      "value": "12345678000195"
                     }
                   ]
                 }
@@ -494,7 +494,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"cnpj\": \"12345678000199\",\n  \"cached\": false,\n  \"source_status\": {\n    \"status\": \"success\",\n    \"error_code\": \"\",\n    \"error_message\": \"\"\n  },\n  \"result\": {\n    \"razao_social\": \"AGROPECUARIA BOA VISTA LTDA\",\n    \"nome_fantasia\": \"FAZENDA BOA VISTA\",\n    \"situacao_cadastral\": \"ATIVA\",\n    \"data_situacao_cadastral\": \"2010-05-20\",\n    \"cnae_principal_codigo\": \"0151-2/01\",\n    \"cnae_principal_descricao\": \"CRIACAO DE BOVINOS PARA CORTE\",\n    \"cnaes_secundarios\": [\n      {\n        \"codigo\": \"0111-3/01\",\n        \"descricao\": \"CULTIVO DE ARROZ\"\n      }\n    ],\n    \"natureza_juridica\": \"206-2 - Sociedade Empresaria Limitada\",\n    \"capital_social\": \"500000.00\",\n    \"endereco\": {\n      \"logradouro\": \"ROD BR-364 KM 28\",\n      \"numero\": \"S/N\",\n      \"complemento\": \"GALPAO 2\",\n      \"bairro\": \"ZONA RURAL\",\n      \"municipio\": \"CUIABA\",\n      \"codigo_ibge\": \"5103403\",\n      \"uf\": \"MT\",\n      \"cep\": \"78000-000\"\n    },\n    \"qsa\": [\n      {\n        \"nome\": \"JOAO DA SILVA\",\n        \"qualificacao\": \"Socio-Administrador\"\n      }\n    ],\n    \"porte\": \"PEQUENO PORTE\"\n  }\n}"
+              "body": "{\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"cnpj\": \"12345678000195\",\n  \"cached\": false,\n  \"source_status\": {\n    \"status\": \"success\",\n    \"error_code\": \"\",\n    \"error_message\": \"\"\n  },\n  \"result\": {\n    \"razao_social\": \"AGROPECUARIA BOA VISTA LTDA\",\n    \"nome_fantasia\": \"FAZENDA BOA VISTA\",\n    \"situacao_cadastral\": \"ATIVA\",\n    \"data_situacao_cadastral\": \"2010-05-20\",\n    \"cnae_principal_codigo\": \"0151-2/01\",\n    \"cnae_principal_descricao\": \"CRIACAO DE BOVINOS PARA CORTE\",\n    \"cnaes_secundarios\": [\n      {\n        \"codigo\": \"0111-3/01\",\n        \"descricao\": \"CULTIVO DE ARROZ\"\n      }\n    ],\n    \"natureza_juridica\": \"206-2 - Sociedade Empresaria Limitada\",\n    \"capital_social\": \"500000.00\",\n    \"endereco\": {\n      \"logradouro\": \"ROD BR-364 KM 28\",\n      \"numero\": \"S/N\",\n      \"complemento\": \"GALPAO 2\",\n      \"bairro\": \"ZONA RURAL\",\n      \"municipio\": \"CUIABA\",\n      \"codigo_ibge\": \"5103403\",\n      \"uf\": \"MT\",\n      \"cep\": \"78000-000\"\n    },\n    \"qsa\": [\n      {\n        \"nome\": \"JOAO DA SILVA\",\n        \"qualificacao\": \"Socio-Administrador\"\n      }\n    ],\n    \"porte\": \"PEQUENO PORTE\"\n  }\n}"
             }
           ]
         },
@@ -509,7 +509,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/consultar-cnpj?cnpj=33000167000101&force_fresh=true",
+              "raw": "{{baseUrl}}/api/consultar-cnpj?cnpj=12345678000195&force_fresh=true",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -520,7 +520,7 @@
               "query": [
                 {
                   "key": "cnpj",
-                  "value": "33000167000101"
+                  "value": "12345678000195"
                 },
                 {
                   "key": "force_fresh",
@@ -549,7 +549,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/consultar-cnd?uf=RJ&cnpj=33000167000101",
+              "raw": "{{baseUrl}}/api/consultar-cnd?uf=RJ&cnpj=12345678000195",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -564,7 +564,7 @@
                 },
                 {
                   "key": "cnpj",
-                  "value": "33000167000101"
+                  "value": "12345678000195"
                 }
               ]
             },
@@ -582,7 +582,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/consultar-cnd?uf=MT&cnpj=12345678000199",
+                  "raw": "{{baseUrl}}/api/consultar-cnd?uf=MT&cnpj=12345678000195",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -597,7 +597,7 @@
                     },
                     {
                       "key": "cnpj",
-                      "value": "12345678000199"
+                      "value": "12345678000195"
                     }
                   ]
                 }
@@ -612,7 +612,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"document\": \"12345678000199\",\n  \"document_type\": \"cnpj\",\n  \"uf\": \"MT\",\n  \"cached\": false,\n  \"source_status\": {\n    \"status\": \"success\",\n    \"error_code\": \"\",\n    \"error_message\": \"\"\n  },\n  \"result\": {\n    \"status\": \"negativa\",\n    \"status_raw\": \"Certidao Negativa\",\n    \"validade\": \"13/09/2026\",\n    \"validade_iso\": \"2026-09-13\",\n    \"emissao\": \"13/03/2026\",\n    \"emissao_iso\": \"2026-03-13\",\n    \"protocolo\": \"123456\",\n    \"pdf_base64\": \"JVBERi0xLjQK...\",\n    \"url_verificacao\": \"\",\n    \"codigo_autenticacao\": \"2MBBTL922UUUB2LK\"\n  }\n}"
+              "body": "{\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"document\": \"12345678000195\",\n  \"document_type\": \"cnpj\",\n  \"uf\": \"MT\",\n  \"cached\": false,\n  \"source_status\": {\n    \"status\": \"success\",\n    \"error_code\": \"\",\n    \"error_message\": \"\"\n  },\n  \"result\": {\n    \"status\": \"negativa\",\n    \"status_raw\": \"Certidao Negativa\",\n    \"validade\": \"13/09/2026\",\n    \"validade_iso\": \"2026-09-13\",\n    \"emissao\": \"13/03/2026\",\n    \"emissao_iso\": \"2026-03-13\",\n    \"protocolo\": \"123456\",\n    \"pdf_base64\": \"JVBERi0xLjQK...\",\n    \"url_verificacao\": \"\",\n    \"codigo_autenticacao\": \"2MBBTL922UUUB2LK\"\n  }\n}"
             },
             {
               "name": "400 - PARAMETRO_AUSENTE",
@@ -666,7 +666,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/consultar-cnd-todos?cnpj=33000167000101",
+              "raw": "{{baseUrl}}/api/consultar-cnd-todos?cnpj=12345678000195",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -677,7 +677,7 @@
               "query": [
                 {
                   "key": "cnpj",
-                  "value": "33000167000101"
+                  "value": "12345678000195"
                 }
               ]
             },
@@ -695,7 +695,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/consultar-cnd-todos?cnpj=12345678000199",
+                  "raw": "{{baseUrl}}/api/consultar-cnd-todos?cnpj=12345678000195",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -706,7 +706,7 @@
                   "query": [
                     {
                       "key": "cnpj",
-                      "value": "12345678000199"
+                      "value": "12345678000195"
                     }
                   ]
                 }
@@ -721,7 +721,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"document\": \"12345678000199\",\n  \"document_type\": \"cnpj\",\n  \"results\": [\n    {\n      \"uf\": \"MT\",\n      \"source_status\": {\n        \"status\": \"success\",\n        \"error_code\": \"\",\n        \"error_message\": \"\"\n      },\n      \"result\": {\n        \"status\": \"negativa\",\n        \"status_raw\": \"Certidao Negativa\",\n        \"validade\": \"13/09/2026\",\n        \"validade_iso\": \"2026-09-13\",\n        \"emissao\": \"13/03/2026\",\n        \"emissao_iso\": \"2026-03-13\",\n        \"protocolo\": \"123456\",\n        \"pdf_base64\": \"\",\n        \"url_verificacao\": \"\",\n        \"codigo_autenticacao\": \"2MBBTL922UUUB2LK\"\n      }\n    },\n    {\n      \"uf\": \"SP\",\n      \"source_status\": {\n        \"status\": \"success\",\n        \"error_code\": \"\",\n        \"error_message\": \"\"\n      },\n      \"result\": {\n        \"status\": \"nao_contribuinte\",\n        \"status_raw\": \"Nao Contribuinte\",\n        \"validade\": \"\",\n        \"validade_iso\": \"\",\n        \"emissao\": \"\",\n        \"emissao_iso\": \"\",\n        \"protocolo\": \"\",\n        \"pdf_base64\": \"\",\n        \"url_verificacao\": \"\",\n        \"codigo_autenticacao\": \"\"\n      }\n    }\n  ]\n}"
+              "body": "{\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"document\": \"12345678000195\",\n  \"document_type\": \"cnpj\",\n  \"results\": [\n    {\n      \"uf\": \"MT\",\n      \"source_status\": {\n        \"status\": \"success\",\n        \"error_code\": \"\",\n        \"error_message\": \"\"\n      },\n      \"result\": {\n        \"status\": \"negativa\",\n        \"status_raw\": \"Certidao Negativa\",\n        \"validade\": \"13/09/2026\",\n        \"validade_iso\": \"2026-09-13\",\n        \"emissao\": \"13/03/2026\",\n        \"emissao_iso\": \"2026-03-13\",\n        \"protocolo\": \"123456\",\n        \"pdf_base64\": \"\",\n        \"url_verificacao\": \"\",\n        \"codigo_autenticacao\": \"2MBBTL922UUUB2LK\"\n      }\n    },\n    {\n      \"uf\": \"SP\",\n      \"source_status\": {\n        \"status\": \"success\",\n        \"error_code\": \"\",\n        \"error_message\": \"\"\n      },\n      \"result\": {\n        \"status\": \"nao_contribuinte\",\n        \"status_raw\": \"Nao Contribuinte\",\n        \"validade\": \"\",\n        \"validade_iso\": \"\",\n        \"emissao\": \"\",\n        \"emissao_iso\": \"\",\n        \"protocolo\": \"\",\n        \"pdf_base64\": \"\",\n        \"url_verificacao\": \"\",\n        \"codigo_autenticacao\": \"\"\n      }\n    }\n  ]\n}"
             },
             {
               "name": "400 - PARAMETRO_AUSENTE",
@@ -775,7 +775,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/consultar-cndt?cnpj=33000167000101",
+              "raw": "{{baseUrl}}/api/consultar-cndt?cnpj=12345678000195",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -786,7 +786,7 @@
               "query": [
                 {
                   "key": "cnpj",
-                  "value": "33000167000101"
+                  "value": "12345678000195"
                 }
               ]
             },
@@ -804,7 +804,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/consultar-cndt?cnpj=12345678000199",
+                  "raw": "{{baseUrl}}/api/consultar-cndt?cnpj=12345678000195",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -815,7 +815,7 @@
                   "query": [
                     {
                       "key": "cnpj",
-                      "value": "12345678000199"
+                      "value": "12345678000195"
                     }
                   ]
                 }
@@ -830,7 +830,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"document\": \"12345678000199\",\n  \"document_type\": \"cnpj\",\n  \"cached\": false,\n  \"source_status\": {\n    \"status\": \"success\",\n    \"error_code\": \"\",\n    \"error_message\": \"\"\n  },\n  \"result\": {\n    \"tipo\": \"cndt\",\n    \"status\": \"negativa\",\n    \"status_raw\": \"CERTIDAO NEGATIVA DE DEBITOS TRABALHISTAS\",\n    \"validade\": \"13/09/2026\",\n    \"validade_iso\": \"2026-09-13\",\n    \"emissao\": \"13/03/2026\",\n    \"emissao_iso\": \"2026-03-13\",\n    \"protocolo\": \"5945624/2026\",\n    \"pdf_base64\": \"JVBERi0xLjQK...\",\n    \"url_verificacao\": \"\",\n    \"orgao\": \"TST\",\n    \"modo\": \"emissao\"\n  }\n}"
+              "body": "{\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"document\": \"12345678000195\",\n  \"document_type\": \"cnpj\",\n  \"cached\": false,\n  \"source_status\": {\n    \"status\": \"success\",\n    \"error_code\": \"\",\n    \"error_message\": \"\"\n  },\n  \"result\": {\n    \"tipo\": \"cndt\",\n    \"status\": \"negativa\",\n    \"status_raw\": \"CERTIDAO NEGATIVA DE DEBITOS TRABALHISTAS\",\n    \"validade\": \"13/09/2026\",\n    \"validade_iso\": \"2026-09-13\",\n    \"emissao\": \"13/03/2026\",\n    \"emissao_iso\": \"2026-03-13\",\n    \"protocolo\": \"5945624/2026\",\n    \"pdf_base64\": \"JVBERi0xLjQK...\",\n    \"url_verificacao\": \"\",\n    \"orgao\": \"TST\",\n    \"modo\": \"emissao\"\n  }\n}"
             },
             {
               "name": "400 - PARAMETRO_AUSENTE",
@@ -878,7 +878,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/consultar-cnd-federal?cnpj=33000167000101",
+              "raw": "{{baseUrl}}/api/consultar-cnd-federal?cnpj=12345678000195",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -889,7 +889,7 @@
               "query": [
                 {
                   "key": "cnpj",
-                  "value": "33000167000101"
+                  "value": "12345678000195"
                 }
               ]
             },
@@ -907,7 +907,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/consultar-cnd-federal?cnpj=12345678000199",
+                  "raw": "{{baseUrl}}/api/consultar-cnd-federal?cnpj=12345678000195",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -918,7 +918,7 @@
                   "query": [
                     {
                       "key": "cnpj",
-                      "value": "12345678000199"
+                      "value": "12345678000195"
                     }
                   ]
                 }
@@ -933,7 +933,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"document\": \"12345678000199\",\n  \"document_type\": \"cnpj\",\n  \"cached\": false,\n  \"source_status\": {\n    \"status\": \"success\",\n    \"error_code\": \"\",\n    \"error_message\": \"\"\n  },\n  \"result\": {\n    \"tipo\": \"cnd_federal\",\n    \"status\": \"negativa\",\n    \"status_raw\": \"Certidao Negativa de Debitos relativos aos Tributos Federais e a Divida Ativa da Uniao\",\n    \"modo\": \"consulta\",\n    \"validade\": \"13/03/2027\",\n    \"validade_iso\": \"2027-03-13\",\n    \"emissao\": \"14/09/2026\",\n    \"emissao_iso\": \"2026-09-14\",\n    \"protocolo\": \"1A2B.3C4D.5E6F.7A8B\",\n    \"pdf_base64\": \"JVBERi0xLjQK...\",\n    \"url_verificacao\": \"\",\n    \"orgao\": \"RFB+PGFN\"\n  }\n}"
+              "body": "{\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"document\": \"12345678000195\",\n  \"document_type\": \"cnpj\",\n  \"cached\": false,\n  \"source_status\": {\n    \"status\": \"success\",\n    \"error_code\": \"\",\n    \"error_message\": \"\"\n  },\n  \"result\": {\n    \"tipo\": \"cnd_federal\",\n    \"status\": \"negativa\",\n    \"status_raw\": \"Certidao Negativa de Debitos relativos aos Tributos Federais e a Divida Ativa da Uniao\",\n    \"modo\": \"consulta\",\n    \"validade\": \"13/03/2027\",\n    \"validade_iso\": \"2027-03-13\",\n    \"emissao\": \"14/09/2026\",\n    \"emissao_iso\": \"2026-09-14\",\n    \"protocolo\": \"1A2B.3C4D.5E6F.7A8B\",\n    \"pdf_base64\": \"JVBERi0xLjQK...\",\n    \"url_verificacao\": \"\",\n    \"orgao\": \"RFB+PGFN\"\n  }\n}"
             },
             {
               "name": "200 - Emissão em andamento",
@@ -946,7 +946,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/consultar-cnd-federal?cnpj=12345678000199",
+                  "raw": "{{baseUrl}}/api/consultar-cnd-federal?cnpj=12345678000195",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -957,7 +957,7 @@
                   "query": [
                     {
                       "key": "cnpj",
-                      "value": "12345678000199"
+                      "value": "12345678000195"
                     }
                   ]
                 }
@@ -976,7 +976,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"document\": \"12345678000199\",\n  \"document_type\": \"cnpj\",\n  \"cached\": false,\n  \"source_status\": {\n    \"status\": \"error\",\n    \"error_code\": \"EM_PROCESSAMENTO\",\n    \"error_message\": \"A emissao desta certidao esta em andamento. Consulte novamente em cerca de 45 s.\"\n  },\n  \"result\": null\n}"
+              "body": "{\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"document\": \"12345678000195\",\n  \"document_type\": \"cnpj\",\n  \"cached\": false,\n  \"source_status\": {\n    \"status\": \"error\",\n    \"error_code\": \"EM_PROCESSAMENTO\",\n    \"error_message\": \"A emissao desta certidao esta em andamento. Consulte novamente em cerca de 45 s.\"\n  },\n  \"result\": null\n}"
             },
             {
               "name": "400 - PARAMETRO_AUSENTE",
@@ -1024,7 +1024,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/consultar-crf-fgts?cnpj=33000167000101",
+              "raw": "{{baseUrl}}/api/consultar-crf-fgts?cnpj=12345678000195",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1035,7 +1035,7 @@
               "query": [
                 {
                   "key": "cnpj",
-                  "value": "33000167000101"
+                  "value": "12345678000195"
                 }
               ]
             },
@@ -1053,7 +1053,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/consultar-crf-fgts?cnpj=12345678000199",
+                  "raw": "{{baseUrl}}/api/consultar-crf-fgts?cnpj=12345678000195",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -1064,7 +1064,7 @@
                   "query": [
                     {
                       "key": "cnpj",
-                      "value": "12345678000199"
+                      "value": "12345678000195"
                     }
                   ]
                 }
@@ -1079,7 +1079,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"document\": \"12345678000199\",\n  \"document_type\": \"cnpj\",\n  \"cached\": false,\n  \"source_status\": {\n    \"status\": \"success\",\n    \"error_code\": \"\",\n    \"error_message\": \"\"\n  },\n  \"result\": {\n    \"tipo\": \"crf_fgts\",\n    \"status\": \"negativa\",\n    \"status_raw\": \"REGULAR perante o FGTS\",\n    \"validade\": \"22/08/2026\",\n    \"validade_iso\": \"2026-08-22\",\n    \"emissao\": \"24/07/2026\",\n    \"emissao_iso\": \"2026-07-24\",\n    \"protocolo\": \"2026072415210313570663\",\n    \"pdf_base64\": \"JVBERi0xLjQK...\",\n    \"url_verificacao\": \"\",\n    \"orgao\": \"CEF\",\n    \"modo\": \"consulta\"\n  }\n}"
+              "body": "{\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"document\": \"12345678000195\",\n  \"document_type\": \"cnpj\",\n  \"cached\": false,\n  \"source_status\": {\n    \"status\": \"success\",\n    \"error_code\": \"\",\n    \"error_message\": \"\"\n  },\n  \"result\": {\n    \"tipo\": \"crf_fgts\",\n    \"status\": \"negativa\",\n    \"status_raw\": \"REGULAR perante o FGTS\",\n    \"validade\": \"22/08/2026\",\n    \"validade_iso\": \"2026-08-22\",\n    \"emissao\": \"24/07/2026\",\n    \"emissao_iso\": \"2026-07-24\",\n    \"protocolo\": \"2026072415210313570663\",\n    \"pdf_base64\": \"JVBERi0xLjQK...\",\n    \"url_verificacao\": \"\",\n    \"orgao\": \"CEF\",\n    \"modo\": \"consulta\"\n  }\n}"
             },
             {
               "name": "400 - PARAMETRO_AUSENTE",
@@ -1127,7 +1127,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/certidoes-todas?cnpj=33000167000101",
+              "raw": "{{baseUrl}}/api/certidoes-todas?cnpj=12345678000195",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1138,7 +1138,7 @@
               "query": [
                 {
                   "key": "cnpj",
-                  "value": "33000167000101"
+                  "value": "12345678000195"
                 }
               ]
             },
@@ -1156,7 +1156,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/certidoes-todas?cnpj=12345678000199",
+                  "raw": "{{baseUrl}}/api/certidoes-todas?cnpj=12345678000195",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -1167,7 +1167,7 @@
                   "query": [
                     {
                       "key": "cnpj",
-                      "value": "12345678000199"
+                      "value": "12345678000195"
                     }
                   ]
                 }
@@ -1182,7 +1182,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"document\": \"12345678000199\",\n  \"document_type\": \"cnpj\",\n  \"cnd_estaduais\": {\n    \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n    \"document\": \"12345678000199\",\n    \"document_type\": \"cnpj\",\n    \"results\": [\n      {\n        \"uf\": \"MT\",\n        \"source_status\": {\n          \"status\": \"success\",\n          \"error_code\": \"\",\n          \"error_message\": \"\"\n        },\n        \"result\": {\n          \"status\": \"negativa\",\n          \"status_raw\": \"Certidao Negativa\",\n          \"validade\": \"13/09/2026\",\n          \"validade_iso\": \"2026-09-13\",\n          \"emissao\": \"13/03/2026\",\n          \"emissao_iso\": \"2026-03-13\",\n          \"protocolo\": \"123456\",\n          \"pdf_base64\": \"\",\n          \"url_verificacao\": \"\",\n          \"codigo_autenticacao\": \"2MBBTL922UUUB2LK\"\n        }\n      },\n      {\n        \"uf\": \"SP\",\n        \"source_status\": {\n          \"status\": \"success\",\n          \"error_code\": \"\",\n          \"error_message\": \"\"\n        },\n        \"result\": {\n          \"status\": \"nao_contribuinte\",\n          \"status_raw\": \"Nao Contribuinte\",\n          \"validade\": \"\",\n          \"validade_iso\": \"\",\n          \"emissao\": \"\",\n          \"emissao_iso\": \"\",\n          \"protocolo\": \"\",\n          \"pdf_base64\": \"\",\n          \"url_verificacao\": \"\",\n          \"codigo_autenticacao\": \"\"\n        }\n      }\n    ]\n  },\n  \"certidoes_federais\": [\n    {\n      \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n      \"document\": \"12345678000199\",\n      \"document_type\": \"cnpj\",\n      \"cached\": false,\n      \"source_status\": {\n        \"status\": \"success\",\n        \"error_code\": \"\",\n        \"error_message\": \"\"\n      },\n      \"result\": {\n        \"tipo\": \"cndt\",\n        \"status\": \"negativa\",\n        \"status_raw\": \"CERTIDAO NEGATIVA DE DEBITOS TRABALHISTAS\",\n        \"validade\": \"13/09/2026\",\n        \"validade_iso\": \"2026-09-13\",\n        \"emissao\": \"13/03/2026\",\n        \"emissao_iso\": \"2026-03-13\",\n        \"protocolo\": \"5945624/2026\",\n        \"pdf_base64\": \"\",\n        \"url_verificacao\": \"\",\n        \"orgao\": \"TST\",\n        \"modo\": \"emissao\"\n      }\n    },\n    {\n      \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n      \"document\": \"12345678000199\",\n      \"document_type\": \"cnpj\",\n      \"cached\": false,\n      \"source_status\": {\n        \"status\": \"success\",\n        \"error_code\": \"\",\n        \"error_message\": \"\"\n      },\n      \"result\": {\n        \"tipo\": \"cnd_federal\",\n        \"status\": \"negativa\",\n        \"status_raw\": \"Certidao Negativa de Debitos relativos aos Tributos Federais e a Divida Ativa da Uniao\",\n        \"modo\": \"consulta\",\n        \"validade\": \"13/03/2027\",\n        \"validade_iso\": \"2027-03-13\",\n        \"emissao\": \"14/09/2026\",\n        \"emissao_iso\": \"2026-09-14\",\n        \"protocolo\": \"1A2B.3C4D.5E6F.7A8B\",\n        \"pdf_base64\": \"\",\n        \"url_verificacao\": \"\",\n        \"orgao\": \"RFB+PGFN\"\n      }\n    },\n    {\n      \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n      \"document\": \"12345678000199\",\n      \"document_type\": \"cnpj\",\n      \"cached\": false,\n      \"source_status\": {\n        \"status\": \"success\",\n        \"error_code\": \"\",\n        \"error_message\": \"\"\n      },\n      \"result\": {\n        \"tipo\": \"crf_fgts\",\n        \"status\": \"negativa\",\n        \"status_raw\": \"REGULAR perante o FGTS\",\n        \"validade\": \"22/08/2026\",\n        \"validade_iso\": \"2026-08-22\",\n        \"emissao\": \"24/07/2026\",\n        \"emissao_iso\": \"2026-07-24\",\n        \"protocolo\": \"2026072415210313570663\",\n        \"pdf_base64\": \"\",\n        \"url_verificacao\": \"\",\n        \"orgao\": \"CEF\",\n        \"modo\": \"consulta\"\n      }\n    }\n  ]\n}"
+              "body": "{\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"document\": \"12345678000195\",\n  \"document_type\": \"cnpj\",\n  \"cnd_estaduais\": {\n    \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n    \"document\": \"12345678000195\",\n    \"document_type\": \"cnpj\",\n    \"results\": [\n      {\n        \"uf\": \"MT\",\n        \"source_status\": {\n          \"status\": \"success\",\n          \"error_code\": \"\",\n          \"error_message\": \"\"\n        },\n        \"result\": {\n          \"status\": \"negativa\",\n          \"status_raw\": \"Certidao Negativa\",\n          \"validade\": \"13/09/2026\",\n          \"validade_iso\": \"2026-09-13\",\n          \"emissao\": \"13/03/2026\",\n          \"emissao_iso\": \"2026-03-13\",\n          \"protocolo\": \"123456\",\n          \"pdf_base64\": \"\",\n          \"url_verificacao\": \"\",\n          \"codigo_autenticacao\": \"2MBBTL922UUUB2LK\"\n        }\n      },\n      {\n        \"uf\": \"SP\",\n        \"source_status\": {\n          \"status\": \"success\",\n          \"error_code\": \"\",\n          \"error_message\": \"\"\n        },\n        \"result\": {\n          \"status\": \"nao_contribuinte\",\n          \"status_raw\": \"Nao Contribuinte\",\n          \"validade\": \"\",\n          \"validade_iso\": \"\",\n          \"emissao\": \"\",\n          \"emissao_iso\": \"\",\n          \"protocolo\": \"\",\n          \"pdf_base64\": \"\",\n          \"url_verificacao\": \"\",\n          \"codigo_autenticacao\": \"\"\n        }\n      }\n    ]\n  },\n  \"certidoes_federais\": [\n    {\n      \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n      \"document\": \"12345678000195\",\n      \"document_type\": \"cnpj\",\n      \"cached\": false,\n      \"source_status\": {\n        \"status\": \"success\",\n        \"error_code\": \"\",\n        \"error_message\": \"\"\n      },\n      \"result\": {\n        \"tipo\": \"cndt\",\n        \"status\": \"negativa\",\n        \"status_raw\": \"CERTIDAO NEGATIVA DE DEBITOS TRABALHISTAS\",\n        \"validade\": \"13/09/2026\",\n        \"validade_iso\": \"2026-09-13\",\n        \"emissao\": \"13/03/2026\",\n        \"emissao_iso\": \"2026-03-13\",\n        \"protocolo\": \"5945624/2026\",\n        \"pdf_base64\": \"\",\n        \"url_verificacao\": \"\",\n        \"orgao\": \"TST\",\n        \"modo\": \"emissao\"\n      }\n    },\n    {\n      \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n      \"document\": \"12345678000195\",\n      \"document_type\": \"cnpj\",\n      \"cached\": false,\n      \"source_status\": {\n        \"status\": \"success\",\n        \"error_code\": \"\",\n        \"error_message\": \"\"\n      },\n      \"result\": {\n        \"tipo\": \"cnd_federal\",\n        \"status\": \"negativa\",\n        \"status_raw\": \"Certidao Negativa de Debitos relativos aos Tributos Federais e a Divida Ativa da Uniao\",\n        \"modo\": \"consulta\",\n        \"validade\": \"13/03/2027\",\n        \"validade_iso\": \"2027-03-13\",\n        \"emissao\": \"14/09/2026\",\n        \"emissao_iso\": \"2026-09-14\",\n        \"protocolo\": \"1A2B.3C4D.5E6F.7A8B\",\n        \"pdf_base64\": \"\",\n        \"url_verificacao\": \"\",\n        \"orgao\": \"RFB+PGFN\"\n      }\n    },\n    {\n      \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n      \"document\": \"12345678000195\",\n      \"document_type\": \"cnpj\",\n      \"cached\": false,\n      \"source_status\": {\n        \"status\": \"success\",\n        \"error_code\": \"\",\n        \"error_message\": \"\"\n      },\n      \"result\": {\n        \"tipo\": \"crf_fgts\",\n        \"status\": \"negativa\",\n        \"status_raw\": \"REGULAR perante o FGTS\",\n        \"validade\": \"22/08/2026\",\n        \"validade_iso\": \"2026-08-22\",\n        \"emissao\": \"24/07/2026\",\n        \"emissao_iso\": \"2026-07-24\",\n        \"protocolo\": \"2026072415210313570663\",\n        \"pdf_base64\": \"\",\n        \"url_verificacao\": \"\",\n        \"orgao\": \"CEF\",\n        \"modo\": \"consulta\"\n      }\n    }\n  ]\n}"
             },
             {
               "name": "400 - PARAMETRO_AUSENTE",
@@ -1418,7 +1418,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/consultar-sigef?cnpj=33000167000101",
+              "raw": "{{baseUrl}}/api/consultar-sigef?cnpj=12345678000195",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1429,7 +1429,7 @@
               "query": [
                 {
                   "key": "cnpj",
-                  "value": "33000167000101"
+                  "value": "12345678000195"
                 }
               ]
             },
@@ -1447,7 +1447,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/consultar-sigef?cpf=12345678900",
+                  "raw": "{{baseUrl}}/api/consultar-sigef?cpf=12345678909",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -1458,7 +1458,7 @@
                   "query": [
                     {
                       "key": "cpf",
-                      "value": "12345678900"
+                      "value": "12345678909"
                     }
                   ]
                 }
@@ -1473,7 +1473,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"document\": \"12345678900\",\n  \"document_type\": \"cpf\",\n  \"cached\": false,\n  \"source_status\": {\n    \"status\": \"success\",\n    \"error_code\": \"\",\n    \"error_message\": \"\"\n  },\n  \"result\": {\n    \"total_parcelas\": 1,\n    \"area_total_ha\": 120.55,\n    \"parcelas\": [\n      {\n        \"parcel_id\": \"b085a96d-8461-402c-bf2b-3c9ab1806d30\",\n        \"codigo_parcela\": \"ABC123-4567\",\n        \"denominacao\": \"Fazenda Boa Vista\",\n        \"area_ha\": 120.55,\n        \"municipio\": \"Pontes e Lacerda\",\n        \"uf\": \"MT\",\n        \"codigo_ibge\": \"5106752\",\n        \"detentor\": \"JOAO DA SILVA\",\n        \"natureza\": \"Particular\",\n        \"codigo_sncr\": \"9511100017838\",\n        \"matricula\": \"12345\",\n        \"cns\": \"06.503-7\",\n        \"cartorio\": \"Primeiro Servico Notarial e Registral\",\n        \"status\": \"Certificada - Com Registro em Cartorio Confirmado\",\n        \"imovel_situacao\": \"Imovel Registrado\",\n        \"registro_situacao\": \"Confirmado\",\n        \"num_parcelas_imovel\": 1,\n        \"data_certificacao\": \"15/03/2022\",\n        \"data_certificacao_iso\": \"2022-03-15\",\n        \"data_entrada\": \"10/05/2021\",\n        \"data_entrada_iso\": \"2021-05-10\",\n        \"responsavel_tecnico\": \"MARIA OLIVEIRA\",\n        \"rt_documento\": \"MT20210012345\",\n        \"geometria_wkt\": \"POLYGON ((-59.335416 -15.2092, -59.3198 -15.2079, -59.3301 -15.2201, -59.335416 -15.2092))\",\n        \"requerimentos\": [\n          {\n            \"tipo\": \"Registro\",\n            \"status\": \"Finalizado\",\n            \"data\": \"20/04/2022\"\n          }\n        ],\n        \"vertices\": [\n          {\n            \"codigo\": \"ABCD-M-0001\",\n            \"longitude\": \"-59°20'07,497\\\"\",\n            \"latitude\": \"-15°12'33,120\\\"\",\n            \"longitude_decimal\": -59.335416,\n            \"latitude_decimal\": -15.2092,\n            \"altitude_m\": 254.3,\n            \"metodo\": \"PG1\"\n          }\n        ],\n        \"confrontantes\": [\n          {\n            \"do_vertice\": \"ABCD-M-0001\",\n            \"ao_vertice\": \"ABCD-P-0002\",\n            \"descricao\": \"CNS: 06.503-7 - Mat. 29.290\",\n            \"cns\": \"06.503-7\",\n            \"matricula\": \"29.290\",\n            \"ocupante\": \"\",\n            \"lado\": \"EXTERNO\",\n            \"tipo_limite\": \"LA6\",\n            \"azimute\": \"92°14'\",\n            \"comprimento_m\": 1250.4\n          }\n        ],\n        \"centroid_lat\": -15.2135,\n        \"centroid_lng\": -59.3301,\n        \"bbox_min_lat\": -15.2201,\n        \"bbox_min_lng\": -59.3412,\n        \"bbox_max_lat\": -15.2079,\n        \"bbox_max_lng\": -59.3198,\n        \"perimetro_m\": 4820.7\n      }\n    ]\n  }\n}"
+              "body": "{\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"document\": \"12345678909\",\n  \"document_type\": \"cpf\",\n  \"cached\": false,\n  \"source_status\": {\n    \"status\": \"success\",\n    \"error_code\": \"\",\n    \"error_message\": \"\"\n  },\n  \"result\": {\n    \"total_parcelas\": 1,\n    \"area_total_ha\": 120.55,\n    \"parcelas\": [\n      {\n        \"parcel_id\": \"b085a96d-8461-402c-bf2b-3c9ab1806d30\",\n        \"codigo_parcela\": \"ABC123-4567\",\n        \"denominacao\": \"Fazenda Boa Vista\",\n        \"area_ha\": 120.55,\n        \"municipio\": \"Pontes e Lacerda\",\n        \"uf\": \"MT\",\n        \"codigo_ibge\": \"5106752\",\n        \"detentor\": \"JOAO DA SILVA\",\n        \"natureza\": \"Particular\",\n        \"codigo_sncr\": \"9511100017838\",\n        \"matricula\": \"12345\",\n        \"cns\": \"06.503-7\",\n        \"cartorio\": \"Primeiro Servico Notarial e Registral\",\n        \"status\": \"Certificada - Com Registro em Cartorio Confirmado\",\n        \"imovel_situacao\": \"Imovel Registrado\",\n        \"registro_situacao\": \"Confirmado\",\n        \"num_parcelas_imovel\": 1,\n        \"data_certificacao\": \"15/03/2022\",\n        \"data_certificacao_iso\": \"2022-03-15\",\n        \"data_entrada\": \"10/05/2021\",\n        \"data_entrada_iso\": \"2021-05-10\",\n        \"responsavel_tecnico\": \"MARIA OLIVEIRA\",\n        \"rt_documento\": \"MT20210012345\",\n        \"geometria_wkt\": \"POLYGON ((-59.335416 -15.2092, -59.3198 -15.2079, -59.3301 -15.2201, -59.335416 -15.2092))\",\n        \"requerimentos\": [\n          {\n            \"tipo\": \"Registro\",\n            \"status\": \"Finalizado\",\n            \"data\": \"20/04/2022\"\n          }\n        ],\n        \"vertices\": [\n          {\n            \"codigo\": \"ABCD-M-0001\",\n            \"longitude\": \"-59°20'07,497\\\"\",\n            \"latitude\": \"-15°12'33,120\\\"\",\n            \"longitude_decimal\": -59.335416,\n            \"latitude_decimal\": -15.2092,\n            \"altitude_m\": 254.3,\n            \"metodo\": \"PG1\"\n          }\n        ],\n        \"confrontantes\": [\n          {\n            \"do_vertice\": \"ABCD-M-0001\",\n            \"ao_vertice\": \"ABCD-P-0002\",\n            \"descricao\": \"CNS: 06.503-7 - Mat. 29.290\",\n            \"cns\": \"06.503-7\",\n            \"matricula\": \"29.290\",\n            \"ocupante\": \"\",\n            \"lado\": \"EXTERNO\",\n            \"tipo_limite\": \"LA6\",\n            \"azimute\": \"92°14'\",\n            \"comprimento_m\": 1250.4\n          }\n        ],\n        \"centroid_lat\": -15.2135,\n        \"centroid_lng\": -59.3301,\n        \"bbox_min_lat\": -15.2201,\n        \"bbox_min_lng\": -59.3412,\n        \"bbox_max_lat\": -15.2079,\n        \"bbox_max_lng\": -59.3198,\n        \"perimetro_m\": 4820.7\n      }\n    ]\n  }\n}"
             },
             {
               "name": "200 - Origem indisponível (HTTP 200, não cobrado)",
@@ -1486,7 +1486,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/consultar-sigef?cpf=12345678900",
+                  "raw": "{{baseUrl}}/api/consultar-sigef?cpf=12345678909",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -1497,7 +1497,7 @@
                   "query": [
                     {
                       "key": "cpf",
-                      "value": "12345678900"
+                      "value": "12345678909"
                     }
                   ]
                 }
@@ -1512,7 +1512,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"document\": \"12345678900\",\n  \"document_type\": \"cpf\",\n  \"cached\": false,\n  \"source_status\": {\n    \"status\": \"error\",\n    \"error_code\": \"SIGEF_UNAVAILABLE\",\n    \"error_message\": \"SIGEF indisponivel no momento. Tente novamente em alguns minutos.\"\n  },\n  \"result\": null\n}"
+              "body": "{\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"document\": \"12345678909\",\n  \"document_type\": \"cpf\",\n  \"cached\": false,\n  \"source_status\": {\n    \"status\": \"error\",\n    \"error_code\": \"SIGEF_UNAVAILABLE\",\n    \"error_message\": \"SIGEF indisponivel no momento. Tente novamente em alguns minutos.\"\n  },\n  \"result\": null\n}"
             },
             {
               "name": "400 - PARAMETRO_AUSENTE",
@@ -1669,7 +1669,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/consultar-cnir?cnpj=33000167000101",
+              "raw": "{{baseUrl}}/api/consultar-cnir?cnpj=12345678000195",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1680,7 +1680,7 @@
               "query": [
                 {
                   "key": "cnpj",
-                  "value": "33000167000101"
+                  "value": "12345678000195"
                 }
               ]
             },
@@ -1698,7 +1698,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/consultar-cnir?cpf=12345678900",
+                  "raw": "{{baseUrl}}/api/consultar-cnir?cpf=12345678909",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -1709,7 +1709,7 @@
                   "query": [
                     {
                       "key": "cpf",
-                      "value": "12345678900"
+                      "value": "12345678909"
                     }
                   ]
                 }
@@ -1724,7 +1724,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"document\": \"12345678900\",\n  \"document_type\": \"cpf\",\n  \"source_status\": {\n    \"status\": \"success\",\n    \"error_code\": \"\",\n    \"error_message\": \"\"\n  },\n  \"pessoa_fisica\": {\n    \"nome\": \"JOAO DA SILVA\",\n    \"data_nascimento\": \"15/05/1980\",\n    \"data_nascimento_iso\": \"1980-05-15\",\n    \"situacao_cadastral\": \"ATIVA\",\n    \"sexo\": \"M\"\n  },\n  \"pessoa_juridica\": null,\n  \"imoveis_cafir\": [\n    {\n      \"cib\": \"0.000.000-0\",\n      \"nirf\": \"0000000\",\n      \"denominacao\": \"FAZENDA SANTA MARIA\",\n      \"area_total\": 5000.5,\n      \"situacao\": \"ATIVA\",\n      \"codigo_situacao\": 1,\n      \"ni_proprietario\": \"12345678900\",\n      \"percentual_proprietario\": 100.0,\n      \"condominos\": [],\n      \"dados_tributarios\": {\n        \"indicador_descaracterizacao\": false,\n        \"origem_imovel\": 1,\n        \"data_aquisicao\": \"2015-06-01\",\n        \"area_adquirida\": 5000.5,\n        \"tipo_aquisicao\": \"COMPRA\",\n        \"imunidades\": [],\n        \"possui_decisao_judicial\": false\n      },\n      \"municipio_sede\": {\n        \"codigo\": \"5107602\",\n        \"uf\": \"MT\",\n        \"nome\": \"RONDONOPOLIS\"\n      }\n    }\n  ],\n  \"total_imoveis\": 1,\n  \"total_imoveis_ativos\": 1\n}"
+              "body": "{\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"document\": \"12345678909\",\n  \"document_type\": \"cpf\",\n  \"source_status\": {\n    \"status\": \"success\",\n    \"error_code\": \"\",\n    \"error_message\": \"\"\n  },\n  \"pessoa_fisica\": {\n    \"nome\": \"JOAO DA SILVA\",\n    \"data_nascimento\": \"15/05/1980\",\n    \"data_nascimento_iso\": \"1980-05-15\",\n    \"situacao_cadastral\": \"ATIVA\",\n    \"sexo\": \"M\"\n  },\n  \"pessoa_juridica\": null,\n  \"imoveis_cafir\": [\n    {\n      \"cib\": \"0.000.000-0\",\n      \"nirf\": \"0000000\",\n      \"denominacao\": \"FAZENDA SANTA MARIA\",\n      \"area_total\": 5000.5,\n      \"situacao\": \"ATIVA\",\n      \"codigo_situacao\": 1,\n      \"ni_proprietario\": \"12345678909\",\n      \"percentual_proprietario\": 100.0,\n      \"condominos\": [],\n      \"dados_tributarios\": {\n        \"indicador_descaracterizacao\": false,\n        \"origem_imovel\": 1,\n        \"data_aquisicao\": \"2015-06-01\",\n        \"area_adquirida\": 5000.5,\n        \"tipo_aquisicao\": \"COMPRA\",\n        \"imunidades\": [],\n        \"possui_decisao_judicial\": false\n      },\n      \"municipio_sede\": {\n        \"codigo\": \"5107602\",\n        \"uf\": \"MT\",\n        \"nome\": \"RONDONOPOLIS\"\n      }\n    }\n  ],\n  \"total_imoveis\": 1,\n  \"total_imoveis_ativos\": 1\n}"
             },
             {
               "name": "400 - PARAMETRO_AUSENTE",
@@ -1778,7 +1778,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/perfil-produtor?cnpj=33000167000101",
+              "raw": "{{baseUrl}}/api/perfil-produtor?cnpj=12345678000195",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1789,7 +1789,7 @@
               "query": [
                 {
                   "key": "cnpj",
-                  "value": "33000167000101"
+                  "value": "12345678000195"
                 }
               ]
             },
@@ -1807,7 +1807,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}/api/perfil-produtor?cnpj=12345678000199",
+                  "raw": "{{baseUrl}}/api/perfil-produtor?cnpj=12345678000195",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -1818,7 +1818,7 @@
                   "query": [
                     {
                       "key": "cnpj",
-                      "value": "12345678000199"
+                      "value": "12345678000195"
                     }
                   ]
                 }
@@ -1833,7 +1833,7 @@
                 }
               ],
               "cookie": [],
-              "body": "{\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"document\": \"12345678000199\",\n  \"receita_federal\": {\n    \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n    \"cnpj\": \"12345678000199\",\n    \"cached\": false,\n    \"source_status\": {\n      \"status\": \"success\",\n      \"error_code\": \"\",\n      \"error_message\": \"\"\n    },\n    \"result\": {\n      \"razao_social\": \"AGROPECUARIA BOA VISTA LTDA\",\n      \"nome_fantasia\": \"FAZENDA BOA VISTA\",\n      \"situacao_cadastral\": \"ATIVA\",\n      \"data_situacao_cadastral\": \"2010-05-20\",\n      \"cnae_principal_codigo\": \"0151-2/01\",\n      \"cnae_principal_descricao\": \"CRIACAO DE BOVINOS PARA CORTE\",\n      \"cnaes_secundarios\": [\n        {\n          \"codigo\": \"0111-3/01\",\n          \"descricao\": \"CULTIVO DE ARROZ\"\n        }\n      ],\n      \"natureza_juridica\": \"206-2 - Sociedade Empresaria Limitada\",\n      \"capital_social\": \"500000.00\",\n      \"endereco\": {\n        \"logradouro\": \"ROD BR-364 KM 28\",\n        \"numero\": \"S/N\",\n        \"complemento\": \"GALPAO 2\",\n        \"bairro\": \"ZONA RURAL\",\n        \"municipio\": \"CUIABA\",\n        \"codigo_ibge\": \"5103403\",\n        \"uf\": \"MT\",\n        \"cep\": \"78000-000\"\n      },\n      \"qsa\": [\n        {\n          \"nome\": \"JOAO DA SILVA\",\n          \"qualificacao\": \"Socio-Administrador\"\n        }\n      ],\n      \"porte\": \"PEQUENO PORTE\"\n    }\n  },\n  \"inscricoes_estaduais\": {\n    \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n    \"document\": \"12345678000199\",\n    \"document_type\": \"cnpj\",\n    \"cached_ufs\": [],\n    \"results\": [\n      {\n        \"uf\": \"MT\",\n        \"source_status\": {\n          \"status\": \"success\",\n          \"error_code\": \"\",\n          \"error_message\": \"\"\n        },\n        \"results\": [\n          {\n            \"inscricao_estadual\": \"13.123.456-7\",\n            \"razao_social\": \"JOAO DA SILVA FAZENDA SANTA MARIA\",\n            \"situacao_ie\": \"ATIVA\",\n            \"uf_ie\": \"MT\",\n            \"tipo_ie\": \"PRODUTOR RURAL\",\n            \"municipio\": \"RONDONOPOLIS\",\n            \"cnae_codigo\": \"0111301\",\n            \"cnae_descricao\": \"CULTIVO DE ARROZ\",\n            \"cnaes_secundarios\": [\n              {\n                \"codigo\": \"0111302\",\n                \"descricao\": \"CULTIVO DE MILHO\"\n              }\n            ]\n          }\n        ]\n      },\n      {\n        \"uf\": \"GO\",\n        \"source_status\": {\n          \"status\": \"success\",\n          \"error_code\": \"\",\n          \"error_message\": \"\"\n        },\n        \"results\": []\n      },\n      {\n        \"uf\": \"RO\",\n        \"source_status\": {\n          \"status\": \"success\",\n          \"error_code\": \"\",\n          \"error_message\": \"\"\n        },\n        \"results\": []\n      }\n    ],\n    \"complete\": true\n  },\n  \"cnd_estaduais\": {\n    \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n    \"document\": \"12345678000199\",\n    \"document_type\": \"cnpj\",\n    \"results\": [\n      {\n        \"uf\": \"MT\",\n        \"source_status\": {\n          \"status\": \"success\",\n          \"error_code\": \"\",\n          \"error_message\": \"\"\n        },\n        \"result\": {\n          \"status\": \"negativa\",\n          \"status_raw\": \"Certidao Negativa\",\n          \"validade\": \"13/09/2026\",\n          \"validade_iso\": \"2026-09-13\",\n          \"emissao\": \"13/03/2026\",\n          \"emissao_iso\": \"2026-03-13\",\n          \"protocolo\": \"123456\",\n          \"pdf_base64\": \"\",\n          \"url_verificacao\": \"\",\n          \"codigo_autenticacao\": \"2MBBTL922UUUB2LK\"\n        }\n      },\n      {\n        \"uf\": \"SP\",\n        \"source_status\": {\n          \"status\": \"success\",\n          \"error_code\": \"\",\n          \"error_message\": \"\"\n        },\n        \"result\": {\n          \"status\": \"nao_contribuinte\",\n          \"status_raw\": \"Nao Contribuinte\",\n          \"validade\": \"\",\n          \"validade_iso\": \"\",\n          \"emissao\": \"\",\n          \"emissao_iso\": \"\",\n          \"protocolo\": \"\",\n          \"pdf_base64\": \"\",\n          \"url_verificacao\": \"\",\n          \"codigo_autenticacao\": \"\"\n        }\n      }\n    ]\n  },\n  \"certidoes_federais\": [\n    {\n      \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n      \"document\": \"12345678000199\",\n      \"document_type\": \"cnpj\",\n      \"cached\": false,\n      \"source_status\": {\n        \"status\": \"success\",\n        \"error_code\": \"\",\n        \"error_message\": \"\"\n      },\n      \"result\": {\n        \"tipo\": \"cndt\",\n        \"status\": \"negativa\",\n        \"status_raw\": \"CERTIDAO NEGATIVA DE DEBITOS TRABALHISTAS\",\n        \"validade\": \"13/09/2026\",\n        \"validade_iso\": \"2026-09-13\",\n        \"emissao\": \"13/03/2026\",\n        \"emissao_iso\": \"2026-03-13\",\n        \"protocolo\": \"5945624/2026\",\n        \"pdf_base64\": \"\",\n        \"url_verificacao\": \"\",\n        \"orgao\": \"TST\",\n        \"modo\": \"emissao\"\n      }\n    },\n    {\n      \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n      \"document\": \"12345678000199\",\n      \"document_type\": \"cnpj\",\n      \"cached\": false,\n      \"source_status\": {\n        \"status\": \"success\",\n        \"error_code\": \"\",\n        \"error_message\": \"\"\n      },\n      \"result\": {\n        \"tipo\": \"cnd_federal\",\n        \"status\": \"negativa\",\n        \"status_raw\": \"Certidao Negativa de Debitos relativos aos Tributos Federais e a Divida Ativa da Uniao\",\n        \"modo\": \"consulta\",\n        \"validade\": \"13/03/2027\",\n        \"validade_iso\": \"2027-03-13\",\n        \"emissao\": \"14/09/2026\",\n        \"emissao_iso\": \"2026-09-14\",\n        \"protocolo\": \"1A2B.3C4D.5E6F.7A8B\",\n        \"pdf_base64\": \"\",\n        \"url_verificacao\": \"\",\n        \"orgao\": \"RFB+PGFN\"\n      }\n    },\n    {\n      \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n      \"document\": \"12345678000199\",\n      \"document_type\": \"cnpj\",\n      \"cached\": false,\n      \"source_status\": {\n        \"status\": \"success\",\n        \"error_code\": \"\",\n        \"error_message\": \"\"\n      },\n      \"result\": {\n        \"tipo\": \"crf_fgts\",\n        \"status\": \"negativa\",\n        \"status_raw\": \"REGULAR perante o FGTS\",\n        \"validade\": \"22/08/2026\",\n        \"validade_iso\": \"2026-08-22\",\n        \"emissao\": \"24/07/2026\",\n        \"emissao_iso\": \"2026-07-24\",\n        \"protocolo\": \"2026072415210313570663\",\n        \"pdf_base64\": \"\",\n        \"url_verificacao\": \"\",\n        \"orgao\": \"CEF\",\n        \"modo\": \"consulta\"\n      }\n    }\n  ],\n  \"cnir\": null,\n  \"lista_suja\": null,\n  \"embargos_ibama\": null,\n  \"car\": null,\n  \"cadin\": null\n}"
+              "body": "{\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"document\": \"12345678000195\",\n  \"receita_federal\": {\n    \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n    \"cnpj\": \"12345678000195\",\n    \"cached\": false,\n    \"source_status\": {\n      \"status\": \"success\",\n      \"error_code\": \"\",\n      \"error_message\": \"\"\n    },\n    \"result\": {\n      \"razao_social\": \"AGROPECUARIA BOA VISTA LTDA\",\n      \"nome_fantasia\": \"FAZENDA BOA VISTA\",\n      \"situacao_cadastral\": \"ATIVA\",\n      \"data_situacao_cadastral\": \"2010-05-20\",\n      \"cnae_principal_codigo\": \"0151-2/01\",\n      \"cnae_principal_descricao\": \"CRIACAO DE BOVINOS PARA CORTE\",\n      \"cnaes_secundarios\": [\n        {\n          \"codigo\": \"0111-3/01\",\n          \"descricao\": \"CULTIVO DE ARROZ\"\n        }\n      ],\n      \"natureza_juridica\": \"206-2 - Sociedade Empresaria Limitada\",\n      \"capital_social\": \"500000.00\",\n      \"endereco\": {\n        \"logradouro\": \"ROD BR-364 KM 28\",\n        \"numero\": \"S/N\",\n        \"complemento\": \"GALPAO 2\",\n        \"bairro\": \"ZONA RURAL\",\n        \"municipio\": \"CUIABA\",\n        \"codigo_ibge\": \"5103403\",\n        \"uf\": \"MT\",\n        \"cep\": \"78000-000\"\n      },\n      \"qsa\": [\n        {\n          \"nome\": \"JOAO DA SILVA\",\n          \"qualificacao\": \"Socio-Administrador\"\n        }\n      ],\n      \"porte\": \"PEQUENO PORTE\"\n    }\n  },\n  \"inscricoes_estaduais\": {\n    \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n    \"document\": \"12345678000195\",\n    \"document_type\": \"cnpj\",\n    \"cached_ufs\": [],\n    \"results\": [\n      {\n        \"uf\": \"MT\",\n        \"source_status\": {\n          \"status\": \"success\",\n          \"error_code\": \"\",\n          \"error_message\": \"\"\n        },\n        \"results\": [\n          {\n            \"inscricao_estadual\": \"13.123.456-7\",\n            \"razao_social\": \"JOAO DA SILVA FAZENDA SANTA MARIA\",\n            \"situacao_ie\": \"ATIVA\",\n            \"uf_ie\": \"MT\",\n            \"tipo_ie\": \"PRODUTOR RURAL\",\n            \"municipio\": \"RONDONOPOLIS\",\n            \"cnae_codigo\": \"0111301\",\n            \"cnae_descricao\": \"CULTIVO DE ARROZ\",\n            \"cnaes_secundarios\": [\n              {\n                \"codigo\": \"0111302\",\n                \"descricao\": \"CULTIVO DE MILHO\"\n              }\n            ]\n          }\n        ]\n      },\n      {\n        \"uf\": \"GO\",\n        \"source_status\": {\n          \"status\": \"success\",\n          \"error_code\": \"\",\n          \"error_message\": \"\"\n        },\n        \"results\": []\n      },\n      {\n        \"uf\": \"RO\",\n        \"source_status\": {\n          \"status\": \"success\",\n          \"error_code\": \"\",\n          \"error_message\": \"\"\n        },\n        \"results\": []\n      }\n    ],\n    \"complete\": true\n  },\n  \"cnd_estaduais\": {\n    \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n    \"document\": \"12345678000195\",\n    \"document_type\": \"cnpj\",\n    \"results\": [\n      {\n        \"uf\": \"MT\",\n        \"source_status\": {\n          \"status\": \"success\",\n          \"error_code\": \"\",\n          \"error_message\": \"\"\n        },\n        \"result\": {\n          \"status\": \"negativa\",\n          \"status_raw\": \"Certidao Negativa\",\n          \"validade\": \"13/09/2026\",\n          \"validade_iso\": \"2026-09-13\",\n          \"emissao\": \"13/03/2026\",\n          \"emissao_iso\": \"2026-03-13\",\n          \"protocolo\": \"123456\",\n          \"pdf_base64\": \"\",\n          \"url_verificacao\": \"\",\n          \"codigo_autenticacao\": \"2MBBTL922UUUB2LK\"\n        }\n      },\n      {\n        \"uf\": \"SP\",\n        \"source_status\": {\n          \"status\": \"success\",\n          \"error_code\": \"\",\n          \"error_message\": \"\"\n        },\n        \"result\": {\n          \"status\": \"nao_contribuinte\",\n          \"status_raw\": \"Nao Contribuinte\",\n          \"validade\": \"\",\n          \"validade_iso\": \"\",\n          \"emissao\": \"\",\n          \"emissao_iso\": \"\",\n          \"protocolo\": \"\",\n          \"pdf_base64\": \"\",\n          \"url_verificacao\": \"\",\n          \"codigo_autenticacao\": \"\"\n        }\n      }\n    ]\n  },\n  \"certidoes_federais\": [\n    {\n      \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n      \"document\": \"12345678000195\",\n      \"document_type\": \"cnpj\",\n      \"cached\": false,\n      \"source_status\": {\n        \"status\": \"success\",\n        \"error_code\": \"\",\n        \"error_message\": \"\"\n      },\n      \"result\": {\n        \"tipo\": \"cndt\",\n        \"status\": \"negativa\",\n        \"status_raw\": \"CERTIDAO NEGATIVA DE DEBITOS TRABALHISTAS\",\n        \"validade\": \"13/09/2026\",\n        \"validade_iso\": \"2026-09-13\",\n        \"emissao\": \"13/03/2026\",\n        \"emissao_iso\": \"2026-03-13\",\n        \"protocolo\": \"5945624/2026\",\n        \"pdf_base64\": \"\",\n        \"url_verificacao\": \"\",\n        \"orgao\": \"TST\",\n        \"modo\": \"emissao\"\n      }\n    },\n    {\n      \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n      \"document\": \"12345678000195\",\n      \"document_type\": \"cnpj\",\n      \"cached\": false,\n      \"source_status\": {\n        \"status\": \"success\",\n        \"error_code\": \"\",\n        \"error_message\": \"\"\n      },\n      \"result\": {\n        \"tipo\": \"cnd_federal\",\n        \"status\": \"negativa\",\n        \"status_raw\": \"Certidao Negativa de Debitos relativos aos Tributos Federais e a Divida Ativa da Uniao\",\n        \"modo\": \"consulta\",\n        \"validade\": \"13/03/2027\",\n        \"validade_iso\": \"2027-03-13\",\n        \"emissao\": \"14/09/2026\",\n        \"emissao_iso\": \"2026-09-14\",\n        \"protocolo\": \"1A2B.3C4D.5E6F.7A8B\",\n        \"pdf_base64\": \"\",\n        \"url_verificacao\": \"\",\n        \"orgao\": \"RFB+PGFN\"\n      }\n    },\n    {\n      \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n      \"document\": \"12345678000195\",\n      \"document_type\": \"cnpj\",\n      \"cached\": false,\n      \"source_status\": {\n        \"status\": \"success\",\n        \"error_code\": \"\",\n        \"error_message\": \"\"\n      },\n      \"result\": {\n        \"tipo\": \"crf_fgts\",\n        \"status\": \"negativa\",\n        \"status_raw\": \"REGULAR perante o FGTS\",\n        \"validade\": \"22/08/2026\",\n        \"validade_iso\": \"2026-08-22\",\n        \"emissao\": \"24/07/2026\",\n        \"emissao_iso\": \"2026-07-24\",\n        \"protocolo\": \"2026072415210313570663\",\n        \"pdf_base64\": \"\",\n        \"url_verificacao\": \"\",\n        \"orgao\": \"CEF\",\n        \"modo\": \"consulta\"\n      }\n    }\n  ],\n  \"cnir\": null,\n  \"lista_suja\": null,\n  \"embargos_ibama\": null,\n  \"car\": null,\n  \"cadin\": null\n}"
             },
             {
               "name": "400 - PARAMETRO_AUSENTE",

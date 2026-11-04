@@ -7,6 +7,8 @@ Coleção Postman e especificação OpenAPI 3.1 da [FiscalAPI](https://fiscalapi
 | `FiscalAPI.postman_collection.json` | Coleção Postman v2.1, com exemplos de resposta (sucesso e erros) |
 | `openapi-publico.json` | OpenAPI 3.1 dos endpoints públicos da API |
 
+A coleção também está publicada no Postman: [FiscalAPI na Postman API Network](https://www.postman.com/fiscalapi-2630264/workspace/fiscalapi). Dá para abrir direto no navegador ou fazer um fork para o seu workspace.
+
 ## Como usar
 
 1. Crie sua conta em [app.fiscalapi.com.br](https://app.fiscalapi.com.br) e copie a chave de API no painel.
