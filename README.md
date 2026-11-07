@@ -16,7 +16,7 @@ A coleção também está publicada no Postman: [FiscalAPI na Postman API Networ
 3. Na coleção, abra **Variables** e cole a chave em `apiKey`, na coluna *Current value*.
 4. Envie qualquer requisição. A chave vai no cabeçalho `X-API-Key`.
 
-O uso pela API exige um plano ativo ou créditos. Planos, limites e consumo de créditos estão na [documentação](https://docs.fiscalapi.com.br).
+Conta que nunca assinou plano, com e-mail confirmado e sem recarga, tem 10 consultas grátis por mês, no painel e pela API: IE em um estado (`/api/consultar`) e CNPJ (`/api/consultar-cnpj`). Não valem para IE em todos os estados nem para CNPJ ao vivo. Depois disso, é preciso plano ou saldo: a API responde `402`. Sem chave, `403` (`API_KEY_ERROR`). Planos, limites e consumo de créditos estão na [documentação](https://docs.fiscalapi.com.br).
 
 ## SDKs
 
@@ -24,6 +24,14 @@ O uso pela API exige um plano ativo ou créditos. Planos, limites e consumo de c
 - Node.js / TypeScript: [fiscalapi-node](https://github.com/fiscalapi-br/fiscalapi-node)
 - PHP: [fiscalapi-php](https://github.com/fiscalapi-br/fiscalapi-php)
 - n8n: [n8n-nodes-fiscalapi](https://github.com/fiscalapi-br/n8n-nodes-fiscalapi)
+
+## Links
+
+- Documentação: [docs.fiscalapi.com.br](https://docs.fiscalapi.com.br)
+- Guias (Excel, Google Sheets, n8n, Make, Power Automate, Python, Node.js, PHP): [docs.fiscalapi.com.br/docs/guias](https://docs.fiscalapi.com.br/docs/guias)
+- Especificação OpenAPI sempre atualizada: [docs.fiscalapi.com.br/openapi.json](https://docs.fiscalapi.com.br/openapi.json)
+- Servidor MCP: [fiscalapi-br/fiscalapi-mcp](https://github.com/fiscalapi-br/fiscalapi-mcp)
+- Para desenvolvedores: [fiscalapi.com.br/desenvolvedores](https://fiscalapi.com.br/desenvolvedores/)
 
 ## Licença
 
