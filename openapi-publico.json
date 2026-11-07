@@ -83,9 +83,9 @@
           "400": {
             "description": "Documento inválido, ausente, conflitante ou UF não suportada",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/ErroProblema"
                 }
               }
             }
@@ -146,9 +146,9 @@
           "500": {
             "description": "Erro interno do servidor",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/ErroProblema"
                 }
               }
             }
@@ -156,9 +156,9 @@
           "502": {
             "description": "Falha ao processar a consulta na fonte oficial",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/ErroProblema"
                 }
               }
             }
@@ -166,9 +166,9 @@
           "503": {
             "description": "Fonte oficial de consulta cadastral indisponível",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/ErroProblema"
                 }
               }
             }
@@ -274,9 +274,9 @@
           "500": {
             "description": "Erro interno do servidor",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/ErroProblema"
                 }
               }
             }
@@ -347,15 +347,15 @@
           "400": {
             "description": "Parâmetro ausente ou conflitante",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/ErroProblema"
                 }
               }
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta (ou cota grátis do mês usada). Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
             "content": {
               "application/json": {
                 "schema": {
@@ -410,9 +410,9 @@
           "500": {
             "description": "Erro interno do servidor",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/ErroProblema"
                 }
               }
             }
@@ -462,15 +462,15 @@
           "400": {
             "description": "Parâmetro ausente",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/ErroProblema"
                 }
               }
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta (ou cota grátis do mês usada). Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
             "content": {
               "application/json": {
                 "schema": {
@@ -525,9 +525,9 @@
           "502": {
             "description": "Todas as fontes de dados falharam",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/ErroProblema"
                 }
               }
             }
@@ -592,15 +592,15 @@
           "400": {
             "description": "Parâmetro ausente",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/ErroProblema"
                 }
               }
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta (ou cota grátis do mês usada). Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
             "content": {
               "application/json": {
                 "schema": {
@@ -655,9 +655,9 @@
           "500": {
             "description": "Erro interno do servidor",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/ErroProblema"
                 }
               }
             }
@@ -711,15 +711,15 @@
           "400": {
             "description": "Parâmetro ausente",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/ErroProblema"
                 }
               }
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta (ou cota grátis do mês usada). Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
             "content": {
               "application/json": {
                 "schema": {
@@ -774,9 +774,9 @@
           "500": {
             "description": "Erro interno do servidor",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/ErroProblema"
                 }
               }
             }
@@ -830,15 +830,15 @@
           "400": {
             "description": "Parametro ausente",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/ErroProblema"
                 }
               }
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta (ou cota grátis do mês usada). Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
             "content": {
               "application/json": {
                 "schema": {
@@ -893,9 +893,9 @@
           "500": {
             "description": "Erro interno do servidor",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/ErroProblema"
                 }
               }
             }
@@ -961,15 +961,15 @@
           "400": {
             "description": "Parametro ausente",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/ErroProblema"
                 }
               }
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta (ou cota grátis do mês usada). Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1024,9 +1024,9 @@
           "500": {
             "description": "Erro interno do servidor",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/ErroProblema"
                 }
               }
             }
@@ -1080,15 +1080,15 @@
           "400": {
             "description": "Parametro ausente",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/ErroProblema"
                 }
               }
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta (ou cota grátis do mês usada). Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1143,9 +1143,9 @@
           "500": {
             "description": "Erro interno do servidor",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/ErroProblema"
                 }
               }
             }
@@ -1211,15 +1211,15 @@
           "400": {
             "description": "Parametro ausente",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/ErroProblema"
                 }
               }
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta (ou cota grátis do mês usada). Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1274,9 +1274,9 @@
           "500": {
             "description": "Erro interno do servidor",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/ErroProblema"
                 }
               }
             }
@@ -1326,15 +1326,15 @@
           "400": {
             "description": "Parâmetro ausente ou documento inválido",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/ErroProblema"
                 }
               }
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta (ou cota grátis do mês usada). Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -1389,9 +1389,9 @@
           "500": {
             "description": "Erro interno do servidor",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/ErroProblema"
                 }
               }
             }
@@ -1434,15 +1434,15 @@
           "400": {
             "description": "CNPJ inválido",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/ErroProblema"
                 }
               }
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta (ou cota grátis do mês usada). Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -1464,9 +1464,9 @@
           "404": {
             "description": "CNPJ não encontrado na base da Receita",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/ErroProblema"
                 }
               }
             }
@@ -1507,9 +1507,9 @@
           "502": {
             "description": "Fonte oficial indisponível",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/ErroProblema"
                 }
               }
             }
@@ -1517,9 +1517,9 @@
           "503": {
             "description": "Consulta temporariamente indisponível (header Retry-After)",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/ErroProblema"
                 }
               }
             }
@@ -1573,15 +1573,15 @@
           "400": {
             "description": "Parametro ausente ou documento invalido",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/ErroProblema"
                 }
               }
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta (ou cota grátis do mês usada). Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -1636,9 +1636,9 @@
           "500": {
             "description": "Erro interno do servidor",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/ErroProblema"
                 }
               }
             }
@@ -1693,15 +1693,15 @@
           "400": {
             "description": "UUID ausente ou invalido",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/ErroProblema"
                 }
               }
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta (ou cota grátis do mês usada). Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -1756,9 +1756,9 @@
           "500": {
             "description": "Erro interno do servidor",
             "content": {
-              "application/json": {
+              "application/problem+json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
+                  "$ref": "#/components/schemas/ErroProblema"
                 }
               }
             }
@@ -1796,7 +1796,7 @@
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta (ou cota grátis do mês usada). Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -1857,7 +1857,7 @@
           "NF-e XML"
         ],
         "summary": "Consultar XML de NF-e por chave, sem certificado",
-        "description": "Retorna o XML de UMA NF-e (modelo 55) a partir da chave de acesso, sem certificado digital. O XML é uma versão para leitura (`tipo_xml` = `leitura`, `assinado` = false): traz os dados da nota, mas não serve para validação de schema nem de assinatura. Para o XML assinado, use /api/consultar-nfe-xml, com certificado. Cobra o XML entregue e também a chave consultada cuja nota não foi encontrada (`nao_encontrado`). Chave inválida, `erro` e a mesma chave repetida logo depois de um `nao_encontrado` não são cobrados. Não entra nas consultas grátis.",
+        "description": "Retorna o XML de UMA NF-e (modelo 55) a partir da chave de acesso, sem certificado digital. O XML é uma versão para leitura (`tipo_xml` = `leitura`, `assinado` = false): traz os dados da nota, mas não serve para validação de schema nem de assinatura. Para o XML assinado, use /api/consultar-nfe-xml, com certificado. Cobra o XML entregue e também a chave consultada cuja nota não foi encontrada (`nao_encontrado`). Chave inválida, `erro` e a mesma chave repetida logo depois de um `nao_encontrado` não são cobrados. Precisa de plano ou recarga.",
         "operationId": "consultar_nfe_xml_sem_certificado_endpoint_api_consultar_nfe_xml_sem_certificado_post",
         "requestBody": {
           "required": true,
@@ -1881,7 +1881,7 @@
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta (ou cota grátis do mês usada). Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
             "content": {
               "application/problem+json": {
                 "schema": {
