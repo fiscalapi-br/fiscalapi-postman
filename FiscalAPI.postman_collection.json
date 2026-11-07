@@ -1400,6 +1400,89 @@
               "body": "{\n  \"type\": \"urn:fiscalapi:error:parametro_ausente\",\n  \"title\": \"PARAMETRO_AUSENTE\",\n  \"status\": 400,\n  \"detail\": \"Informe a chave de acesso\",\n  \"instance\": \"https://api.fiscalapi.com.br/api/consultar-nfe-xml\",\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"timestamp\": \"2026-10-20T13:00:00+00:00\"\n}"
             }
           ]
+        },
+        {
+          "name": "Baixar XML da NF-e sem certificado (cópia para leitura)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/consultar-nfe-xml-sem-certificado",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "consultar-nfe-xml-sem-certificado"
+              ]
+            },
+            "description": "Retorna uma **cópia para leitura** do XML de **uma** NF-e (modelo 55) a partir da chave de acesso de 44 dígitos, **sem certificado digital**. Traz itens (NCM, CFOP, quantidade, valor), impostos, emitente, destinatário, transporte e pagamento. Vem sem a assinatura digital (`assinado: false`, `tipo_xml: \"leitura\"`): serve para ler, não para escriturar, e não mostra se a nota foi cancelada. Para o XML assinado (nfeProc), use **Baixar XML da NF-e por chave de acesso**, com o certificado A1.\n\n**Plano:** precisa de plano (a partir do Lite); não entra nas consultas grátis.\n\n**Cobrança:** cobra o XML entregue e também a chave válida cuja nota não foi encontrada (`nao_encontrado`). Chave inválida, `erro` e a mesma chave repetida logo depois de um `nao_encontrado` não são cobrados.\n\nPágina: https://fiscalapi.com.br/xml-nfe-sem-certificado/ · Documentação: https://docs.fiscalapi.com.br",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"chave\": \"{{chaveNfe}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "200 - Sucesso (exemplo fictício)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/consultar-nfe-xml-sem-certificado",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "consultar-nfe-xml-sem-certificado"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"chave\": \"35261012345678000195550010000001231123456784\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"request_id\": \"req_exemplo\",\n  \"total\": 1,\n  \"com_dado\": 1,\n  \"creditos_cobrados\": 2,\n  \"resultados\": [\n    {\n      \"chave\": \"35261012345678000195550010000001231123456784\",\n      \"status\": \"ok\",\n      \"mensagem\": \"\",\n      \"xml\": \"(XML da nota, sem assinatura)\",\n      \"assinado\": false,\n      \"tipo_xml\": \"leitura\"\n    }\n  ]\n}"
+            }
+          ]
         }
       ]
     },
