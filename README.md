@@ -1,6 +1,6 @@
 # FiscalAPI — coleção Postman e OpenAPI
 
-Coleção Postman e especificação OpenAPI 3.1 da [FiscalAPI](https://fiscalapi.com.br): Inscrição Estadual nos 27 estados, CNPJ, certidões (CND estadual, CND Federal, CNDT, CRF/FGTS), XML de NF-e por chave, SIGEF, CNIR e perfil do produtor rural.
+Coleção Postman e especificação OpenAPI 3.1 da [FiscalAPI](https://fiscalapi.com.br): Inscrição Estadual nos 27 estados, CNPJ, certidões (CND estadual, CND Federal, CNDT, CRF/FGTS), XML de NF-e por chave (com certificado, ou cópia para leitura sem certificado), SIGEF, CNIR e perfil do produtor rural.
 
 | Arquivo | O que é |
 |---|---|
