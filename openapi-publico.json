@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "FiscalAPI",
-    "description": "API REST da FiscalAPI para consultar inscrição estadual (IE) nos 27 estados, CNPJ, certidões negativas estaduais e federais, XML de NF-e pela chave de acesso, imóveis rurais (CNIR e SIGEF), Simples Nacional, status da SEFAZ e o catálogo de rejeições da NF-e.\n\nAutenticação: envie a sua chave no cabeçalho `X-API-Key`. A chave é criada no painel (app.fiscalapi.com.br); sem ela, ou com chave inválida, a resposta é 403.\n\nCobrança: as consultas usam o saldo do plano. Conta que nunca assinou, com e-mail confirmado, tem 10 consultas grátis por mês de IE (em um estado) e de CNPJ, somadas com as do painel. O resto pede plano ou saldo, e a chamada sem saldo devolve 402. Limite por minuto conforme o plano; acima dele, 429 com o cabeçalho Retry-After.\n\nDocumentação completa: https://docs.fiscalapi.com.br",
+    "description": "API REST da FiscalAPI para consultar inscrição estadual (IE) nos 27 estados, CNPJ, certidões negativas estaduais e federais, XML de NF-e pela chave de acesso, NFS-e do padrão nacional pela chave de acesso, imóveis rurais (CNIR e SIGEF), Simples Nacional, status da SEFAZ e o catálogo de rejeições da NF-e.\n\nAutenticação: envie a sua chave no cabeçalho `X-API-Key`. A chave é criada no painel (app.fiscalapi.com.br); sem ela, ou com chave inválida, a resposta é 403.\n\nCobrança: as consultas usam o saldo do plano. Conta que nunca assinou, com e-mail confirmado, tem 10 consultas grátis por mês de IE (em um estado) e de CNPJ, somadas com as do painel. O resto pede plano ou saldo, e a chamada sem saldo devolve 402. Limite por minuto conforme o plano; acima dele, 429 com o cabeçalho Retry-After.\n\nDocumentação completa: https://docs.fiscalapi.com.br",
     "version": "1.0.0"
   },
   "servers": [
@@ -1926,6 +1926,163 @@
                   "$ref": "#/components/schemas/ErroLimite"
                 }
               },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/consultar-nfse": {
+      "get": {
+        "tags": [
+          "NFS-e"
+        ],
+        "summary": "Consultar NFS-e por chave de acesso",
+        "description": "Consulta uma NFS-e do padrão nacional a partir da chave de acesso (50 dígitos), sem certificado digital. Retorna emitente, tomador, serviço, tributação municipal e federal e a situação de geração (`situacao`: 100 gerada, 101 de substituição, 102 por decisão judicial, 103 avulsa); `situacao` não indica cancelamento. Com `danfse=true`, inclui o PDF do DANFSe em base64 (`danfse_pdf_base64`). Uma consulta nova leva de 30 a 60 segundos; a mesma chave consultada de novo em até 24 h volta do cache na hora (`cached: true`) e também é cobrada. Cobra só a NFS-e entregue (mesmo preço do XML de NF-e sem certificado). Chave inválida, nota não encontrada e falha não são cobradas. Não entra nas consultas grátis.",
+        "operationId": "consultar_nfse_endpoint_api_consultar_nfse_get",
+        "parameters": [
+          {
+            "name": "chave",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Chave de acesso da NFS-e (50 dígitos)",
+              "title": "Chave"
+            },
+            "description": "Chave de acesso da NFS-e (50 dígitos)"
+          },
+          {
+            "name": "danfse",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Incluir o PDF do DANFSe em base64",
+              "default": false,
+              "title": "Danfse"
+            },
+            "description": "Incluir o PDF do DANFSe em base64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "NFS-e encontrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NfseResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Chave ausente ou inválida (formato ou dígito verificador)",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Chave ausente, inválida ou revogada.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "NFS-e não encontrada para a chave informada",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Aceite da versão vigente dos Termos pendente",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de requisições por minuto excedido. Veja o cabeçalho Retry-After.",
+            "headers": {
+              "Retry-After": {
+                "description": "Segundos até poder tentar de novo.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroLimite"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Fonte oficial indisponível",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Consulta temporariamente indisponível (header Retry-After)",
+            "content": {
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErroProblema"
@@ -4582,6 +4739,790 @@
         ],
         "title": "NfeXmlSemCertResponse"
       },
+      "NfseDps": {
+        "properties": {
+          "numero": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Numero"
+          },
+          "serie": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Serie"
+          },
+          "data_emissao": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data Emissao"
+          }
+        },
+        "type": "object",
+        "title": "NfseDps"
+      },
+      "NfseEmitente": {
+        "properties": {
+          "razao_social": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Razao Social"
+          },
+          "cpf_cnpj": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cpf Cnpj"
+          },
+          "inscricao_municipal": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Inscricao Municipal"
+          },
+          "situacao_simples_nacional": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Situacao Simples Nacional"
+          },
+          "regime_especial_tributacao": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Regime Especial Tributacao"
+          },
+          "endereco": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NfseEndereco"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "title": "NfseEmitente"
+      },
+      "NfseEndereco": {
+        "properties": {
+          "logradouro": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Logradouro"
+          },
+          "numero": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Numero"
+          },
+          "complemento": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Complemento"
+          },
+          "bairro": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bairro"
+          },
+          "cep": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cep"
+          },
+          "municipio": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Municipio"
+          },
+          "uf": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Uf"
+          }
+        },
+        "type": "object",
+        "title": "NfseEndereco"
+      },
+      "NfsePessoa": {
+        "properties": {
+          "cpf_cnpj": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cpf Cnpj"
+          },
+          "inscricao_municipal": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Inscricao Municipal"
+          },
+          "nome": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nome"
+          }
+        },
+        "type": "object",
+        "title": "NfsePessoa"
+      },
+      "NfseResponse": {
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "title": "Request Id"
+          },
+          "chave": {
+            "type": "string",
+            "title": "Chave"
+          },
+          "numero_nfse": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Numero Nfse",
+            "description": "Número da NFS-e (da chave)"
+          },
+          "codigo_municipio_emissor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Codigo Municipio Emissor",
+            "description": "Código IBGE do município emissor (da chave)"
+          },
+          "data_geracao": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data Geracao"
+          },
+          "versao": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Versao"
+          },
+          "dps": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NfseDps"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "situacao": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NfseSituacao"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "emitente": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NfseEmitente"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "tomador": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NfsePessoa"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "intermediario": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NfsePessoa"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "servico": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NfseServico"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "tributacao_municipal": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NfseTributacaoMunicipal"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "tributacao_federal": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NfseTributacaoFederal"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "total_tributos": {
+            "items": {
+              "$ref": "#/components/schemas/NfseTributoTotal"
+            },
+            "type": "array",
+            "title": "Total Tributos",
+            "default": []
+          },
+          "informacoes_complementares": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Informacoes Complementares"
+          },
+          "ambiente_gerador": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ambiente Gerador"
+          },
+          "cached": {
+            "type": "boolean",
+            "title": "Cached",
+            "description": "True quando a resposta veio do cache (TTL configurável)"
+          },
+          "danfse_pdf_base64": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Danfse Pdf Base64",
+            "description": "PDF do DANFSe em base64 (só com danfse=true)"
+          },
+          "aviso": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Aviso",
+            "description": "Presente quando o PDF pedido não pôde ser obtido"
+          }
+        },
+        "type": "object",
+        "required": [
+          "request_id",
+          "chave",
+          "cached"
+        ],
+        "title": "NfseResponse"
+      },
+      "NfseServico": {
+        "properties": {
+          "pais": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pais"
+          },
+          "municipio": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Municipio"
+          },
+          "codigo_tributacao_nacional": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Codigo Tributacao Nacional"
+          },
+          "descricao_codigo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Descricao Codigo"
+          },
+          "item_nbs": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Item Nbs"
+          },
+          "descricao": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Descricao"
+          }
+        },
+        "type": "object",
+        "title": "NfseServico"
+      },
+      "NfseSituacao": {
+        "properties": {
+          "codigo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Codigo",
+            "description": "Ex.: 100"
+          },
+          "descricao": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Descricao",
+            "description": "Ex.: NFS-e Gerada"
+          }
+        },
+        "type": "object",
+        "title": "NfseSituacao"
+      },
+      "NfseTributacaoFederal": {
+        "properties": {
+          "situacao_pis_cofins": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Situacao Pis Cofins"
+          },
+          "base_calculo_pis_cofins": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Base Calculo Pis Cofins"
+          },
+          "aliquota_pis": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Aliquota Pis"
+          },
+          "valor_pis": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valor Pis"
+          },
+          "aliquota_cofins": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Aliquota Cofins"
+          },
+          "valor_cofins": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valor Cofins"
+          },
+          "irrf": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Irrf"
+          },
+          "contribuicoes_sociais_retidas": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contribuicoes Sociais Retidas"
+          },
+          "contribuicao_previdenciaria_retida": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contribuicao Previdenciaria Retida"
+          }
+        },
+        "type": "object",
+        "title": "NfseTributacaoFederal"
+      },
+      "NfseTributacaoMunicipal": {
+        "properties": {
+          "tributacao_issqn": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tributacao Issqn"
+          },
+          "municipio_incidencia": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Municipio Incidencia"
+          },
+          "valor_servico": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valor Servico"
+          },
+          "desconto_incondicionado": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Desconto Incondicionado"
+          },
+          "deducoes": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deducoes"
+          },
+          "beneficio_municipal": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Beneficio Municipal"
+          },
+          "base_calculo": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Base Calculo"
+          },
+          "aliquota": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Aliquota",
+            "description": "Percentual (2.5 = 2,5%)"
+          },
+          "valor_issqn": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valor Issqn"
+          },
+          "retencao": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retencao"
+          }
+        },
+        "type": "object",
+        "title": "NfseTributacaoMunicipal"
+      },
+      "NfseTributoTotal": {
+        "properties": {
+          "descricao": {
+            "type": "string",
+            "title": "Descricao"
+          },
+          "valor": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valor"
+          }
+        },
+        "type": "object",
+        "required": [
+          "descricao"
+        ],
+        "title": "NfseTributoTotal"
+      },
       "ProducerProfile": {
         "properties": {
           "request_id": {
@@ -5537,12 +6478,30 @@
           "opcoes_periodos_anteriores": {
             "type": "string",
             "title": "Opcoes Periodos Anteriores",
+            "description": "'Não Existem' ou os períodos por extenso, separados por '; '",
             "default": ""
+          },
+          "opcoes_periodos_anteriores_lista": {
+            "items": {
+              "$ref": "#/components/schemas/SimplesNacionalPeriodoAnterior"
+            },
+            "type": "array",
+            "title": "Opcoes Periodos Anteriores Lista",
+            "default": []
           },
           "enquadramentos_simei_periodos_anteriores": {
             "type": "string",
             "title": "Enquadramentos Simei Periodos Anteriores",
+            "description": "'Não Existem' ou os períodos por extenso, separados por '; '",
             "default": ""
+          },
+          "enquadramentos_simei_periodos_anteriores_lista": {
+            "items": {
+              "$ref": "#/components/schemas/SimplesNacionalPeriodoAnterior"
+            },
+            "type": "array",
+            "title": "Enquadramentos Simei Periodos Anteriores Lista",
+            "default": []
           },
           "eventos_futuros_simples": {
             "type": "string",
@@ -5562,6 +6521,30 @@
         },
         "type": "object",
         "title": "SimplesNacionalMaisInfo"
+      },
+      "SimplesNacionalPeriodoAnterior": {
+        "properties": {
+          "data_inicial": {
+            "type": "string",
+            "title": "Data Inicial"
+          },
+          "data_final": {
+            "type": "string",
+            "title": "Data Final"
+          },
+          "detalhamento": {
+            "type": "string",
+            "title": "Detalhamento",
+            "description": "Motivo do fim do período, como a Receita informa (ex.: 'Excluída por Opção do Contribuinte')"
+          }
+        },
+        "type": "object",
+        "required": [
+          "data_inicial",
+          "data_final",
+          "detalhamento"
+        ],
+        "title": "SimplesNacionalPeriodoAnterior"
       },
       "SimplesNacionalResponse": {
         "properties": {
@@ -5873,6 +6856,10 @@
     {
       "name": "NF-e XML",
       "description": "XML da NF-e pela chave de acesso, com o seu certificado digital ou sem certificado."
+    },
+    {
+      "name": "NFS-e",
+      "description": "NFS-e do padrão nacional pela chave de acesso, sem certificado digital, com o PDF do DANFSe opcional."
     },
     {
       "name": "Saldo",
