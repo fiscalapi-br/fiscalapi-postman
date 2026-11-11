@@ -784,6 +784,125 @@
         }
       }
     },
+    "/api/validar-cnd": {
+      "get": {
+        "tags": [
+          "CND Estadual"
+        ],
+        "summary": "Validar CND Estadual pelo código da certidão",
+        "description": "Confere na fonte uma certidão estadual já emitida, pelo número ou código de autenticidade impresso nela. Use quando o órgão não emite a certidão por CPF/CNPJ para terceiros: RJ (empresa inscrita no ICMS) e MG (certidão positiva). Devolve se a certidão é autêntica, se ainda vale, o tipo (negativa/positiva) e o PDF. Disponível para MG e RJ.",
+        "operationId": "validar_cnd_estadual_api_validar_cnd_get",
+        "parameters": [
+          {
+            "name": "uf",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Sigla do estado da certidão: MG ou RJ",
+              "title": "Uf"
+            },
+            "description": "Sigla do estado da certidão: MG ou RJ"
+          },
+          {
+            "name": "codigo",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "MG: código de autenticidade (32 caracteres). RJ: número da certidão (ex.: 2026.1.8937822-5) ou código de verificação de autenticidade (32 caracteres).",
+              "title": "Codigo"
+            },
+            "description": "MG: código de autenticidade (32 caracteres). RJ: número da certidão (ex.: 2026.1.8937822-5) ou código de verificação de autenticidade (32 caracteres)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CNDValidacaoResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "UF sem validação ou código em formato inválido",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Saldo insuficiente para esta consulta (ou cota grátis do mês usada). Assine um plano ou recarregue.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroLimite"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Chave ausente, inválida ou revogada.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de requisições por minuto excedido. Veja o cabeçalho Retry-After.",
+            "headers": {
+              "Retry-After": {
+                "description": "Segundos até poder tentar de novo.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroLimite"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Erro interno do servidor",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/consultar-cndt": {
       "get": {
         "tags": [
@@ -2809,6 +2928,162 @@
             "status_raw": "Certidão Negativa",
             "url_verificacao": "",
             "validade": "2026-09-13"
+          }
+        ]
+      },
+      "CNDValidacaoResponse": {
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "title": "Request Id"
+          },
+          "uf": {
+            "type": "string",
+            "title": "Uf"
+          },
+          "codigo": {
+            "type": "string",
+            "title": "Codigo"
+          },
+          "source_status": {
+            "$ref": "#/components/schemas/SourceStatus"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CNDValidacaoResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "request_id",
+          "uf",
+          "codigo",
+          "source_status"
+        ],
+        "title": "CNDValidacaoResponse",
+        "examples": [
+          {
+            "codigo": "2026189378225",
+            "request_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+            "result": {
+              "codigo": "2026189378225",
+              "documento": "76.483.817",
+              "emissao": "10/11/2026",
+              "pdf_base64": "",
+              "situacao": "autentica",
+              "status": "negativa",
+              "status_raw": "CERTIDÃO NEGATIVA DE DÉBITOS - CND",
+              "validade": "10/12/2026"
+            },
+            "source_status": {
+              "error_code": "",
+              "error_message": "",
+              "status": "success"
+            },
+            "uf": "RJ"
+          }
+        ]
+      },
+      "CNDValidacaoResult": {
+        "properties": {
+          "situacao": {
+            "type": "string",
+            "enum": [
+              "autentica",
+              "vencida",
+              "nao_encontrada"
+            ],
+            "title": "Situacao"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "negativa",
+              "positiva",
+              "positiva_com_efeitos_de_negativa",
+              "nao_contribuinte",
+              "sem_certidao",
+              "erro"
+            ],
+            "title": "Status",
+            "default": "erro"
+          },
+          "status_raw": {
+            "type": "string",
+            "title": "Status Raw",
+            "default": ""
+          },
+          "documento": {
+            "type": "string",
+            "title": "Documento",
+            "default": ""
+          },
+          "nome": {
+            "type": "string",
+            "title": "Nome",
+            "default": ""
+          },
+          "emissao": {
+            "type": "string",
+            "title": "Emissao",
+            "default": ""
+          },
+          "validade": {
+            "type": "string",
+            "title": "Validade",
+            "default": ""
+          },
+          "codigo": {
+            "type": "string",
+            "title": "Codigo",
+            "default": ""
+          },
+          "pdf_base64": {
+            "type": "string",
+            "title": "Pdf Base64",
+            "default": ""
+          },
+          "url_verificacao": {
+            "type": "string",
+            "title": "Url Verificacao",
+            "default": ""
+          },
+          "validade_iso": {
+            "type": "string",
+            "title": "Validade Iso",
+            "readOnly": true
+          },
+          "emissao_iso": {
+            "type": "string",
+            "title": "Emissao Iso",
+            "readOnly": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "situacao",
+          "validade_iso",
+          "emissao_iso"
+        ],
+        "title": "CNDValidacaoResult",
+        "examples": [
+          {
+            "codigo": "2026189378225",
+            "documento": "76.483.817",
+            "emissao": "10/11/2026",
+            "nome": "",
+            "pdf_base64": "",
+            "situacao": "autentica",
+            "status": "negativa",
+            "status_raw": "CERTIDÃO NEGATIVA DE DÉBITOS - CND",
+            "url_verificacao": "",
+            "validade": "10/12/2026"
           }
         ]
       },
