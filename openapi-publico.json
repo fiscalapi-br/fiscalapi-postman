@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "FiscalAPI",
-    "description": "API REST da FiscalAPI para consultar inscrição estadual (IE) nos 27 estados, CNPJ, certidões negativas estaduais e federais, XML de NF-e pela chave de acesso, NFS-e do padrão nacional pela chave de acesso, imóveis rurais (CNIR e SIGEF), Simples Nacional, status da SEFAZ e o catálogo de rejeições da NF-e.\n\nAutenticação: envie a sua chave no cabeçalho `X-API-Key`. A chave é criada no painel (app.fiscalapi.com.br); sem ela, ou com chave inválida, a resposta é 403.\n\nCobrança: as consultas usam o saldo do plano. Conta que nunca assinou, com e-mail confirmado, tem 10 consultas grátis por mês em qualquer consulta avulsa, somadas com as do painel, e mais 10 XML de NF-e com certificado. Não entram no grátis a NF-e sem certificado e as consultas em todos os estados ou de todas as certidões de uma vez. O resto pede plano ou saldo, e a chamada sem saldo devolve 402. Limite por minuto conforme o plano; acima dele, 429 com o cabeçalho Retry-After.\n\nDocumentação completa: https://docs.fiscalapi.com.br",
+    "description": "API REST da FiscalAPI para consultar inscrição estadual (IE) nos 27 estados, CNPJ, certidões negativas estaduais e federais, XML de NF-e pela chave de acesso, NFS-e do padrão nacional pela chave de acesso, imóveis rurais (CNIR e SIGEF), Simples Nacional, status da SEFAZ e o catálogo de rejeições da NF-e.\n\nAutenticação: envie a sua chave no cabeçalho `X-API-Key`. A chave é criada no painel (app.fiscalapi.com.br); sem ela, ou com chave inválida, a resposta é 403.\n\nCobrança: as consultas usam o saldo do plano. Sem plano ou saldo, a chamada devolve 402. Para testar antes de assinar, use as 10 consultas grátis do mês no painel. Limite por minuto conforme o plano; acima dele, 429 com o cabeçalho Retry-After.\n\nDocumentação completa: https://docs.fiscalapi.com.br",
     "version": "1.0.0"
   },
   "servers": [
@@ -91,7 +91,7 @@
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta (ou cota grátis do mês usada). Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
             "content": {
               "application/json": {
                 "schema": {
@@ -219,7 +219,7 @@
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta (ou cota grátis do mês usada). Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
             "content": {
               "application/json": {
                 "schema": {
@@ -470,7 +470,7 @@
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta (ou cota grátis do mês usada). Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
             "content": {
               "application/json": {
                 "schema": {
@@ -600,7 +600,7 @@
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta (ou cota grátis do mês usada). Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
             "content": {
               "application/json": {
                 "schema": {
@@ -838,7 +838,7 @@
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta (ou cota grátis do mês usada). Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
             "content": {
               "application/json": {
                 "schema": {
@@ -957,7 +957,7 @@
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta (ou cota grátis do mês usada). Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1088,7 +1088,7 @@
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta (ou cota grátis do mês usada). Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1207,7 +1207,7 @@
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta (ou cota grátis do mês usada). Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1453,7 +1453,7 @@
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta (ou cota grátis do mês usada). Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -1561,7 +1561,7 @@
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta (ou cota grátis do mês usada). Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -1700,7 +1700,7 @@
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta (ou cota grátis do mês usada). Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -1820,7 +1820,7 @@
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta (ou cota grátis do mês usada). Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -1915,7 +1915,7 @@
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta (ou cota grátis do mês usada). Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -2061,7 +2061,7 @@
           "NFS-e"
         ],
         "summary": "Consultar NFS-e por chave de acesso",
-        "description": "Consulta uma NFS-e do padrão nacional a partir da chave de acesso (50 dígitos), sem certificado digital. Retorna emitente, tomador, serviço, tributação municipal e federal e a situação de geração (`situacao`: 100 gerada, 101 de substituição, 102 por decisão judicial, 103 avulsa); `situacao` não indica cancelamento. Com `danfse=true`, inclui o PDF do DANFSe em base64 (`danfse_pdf_base64`). Uma consulta nova leva de 30 a 60 segundos; a mesma chave consultada de novo em até 24 h volta do cache na hora (`cached: true`) e também é cobrada. Cobra só a NFS-e entregue (mesmo preço do XML de NF-e sem certificado). Chave inválida, nota não encontrada e falha não são cobradas. Conta sem plano pode usar as consultas grátis do mês.",
+        "description": "Consulta uma NFS-e do padrão nacional a partir da chave de acesso (50 dígitos), sem certificado digital. Retorna emitente, tomador, serviço, tributação municipal e federal e a situação de geração (`situacao`: 100 gerada, 101 de substituição, 102 por decisão judicial, 103 avulsa); `situacao` não indica cancelamento. Com `danfse=true`, inclui o PDF do DANFSe em base64 (`danfse_pdf_base64`). Uma consulta nova leva de 30 a 60 segundos; a mesma chave consultada de novo em até 24 h volta do cache na hora (`cached: true`) e também é cobrada. Cobra só a NFS-e entregue (mesmo preço do XML de NF-e sem certificado). Chave inválida, nota não encontrada e falha não são cobradas.",
         "operationId": "consultar_nfse_endpoint_api_consultar_nfse_get",
         "parameters": [
           {
@@ -2117,7 +2117,7 @@
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta (ou cota grátis do mês usada). Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -4473,18 +4473,6 @@
               "null"
             ],
             "description": "Quantas consultas deste tipo o saldo ainda paga."
-          },
-          "free_queries_used": {
-            "type": "integer",
-            "description": "Consultas grátis do mês já usadas (só quando a cota acabou)."
-          },
-          "free_queries_limit": {
-            "type": "integer",
-            "description": "Consultas grátis por mês."
-          },
-          "free_queries_renew_on": {
-            "type": "string",
-            "description": "Dia em que a cota grátis renova (DD/MM/AAAA)."
           },
           "retry_after": {
             "type": "integer",
