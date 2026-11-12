@@ -2061,7 +2061,7 @@
           "NFS-e"
         ],
         "summary": "Consultar NFS-e por chave de acesso",
-        "description": "Consulta uma NFS-e do padrão nacional a partir da chave de acesso (50 dígitos), sem certificado digital. Retorna emitente, tomador, serviço, tributação municipal e federal e a situação de geração (`situacao`: 100 gerada, 101 de substituição, 102 por decisão judicial, 103 avulsa); `situacao` não indica cancelamento. Com `danfse=true`, inclui o PDF do DANFSe em base64 (`danfse_pdf_base64`). Uma consulta nova leva de 30 a 60 segundos; a mesma chave consultada de novo em até 24 h volta do cache na hora (`cached: true`) e também é cobrada. Cobra só a NFS-e entregue (mesmo preço do XML de NF-e sem certificado). Chave inválida, nota não encontrada e falha não são cobradas. Conta sem plano pode usar as consultas grátis do mês.",
+        "description": "Consulta uma NFS-e do padrão nacional a partir da chave de acesso (50 dígitos), sem certificado digital. Retorna emitente, tomador, serviço, tributação municipal e federal e a situação de geração (`situacao`: 100 gerada, 101 de substituição, 102 por decisão judicial, 103 avulsa); `situacao` não indica cancelamento. Com `danfse=true`, inclui o PDF do DANFSe em base64 (`danfse_pdf_base64`). Uma consulta nova leva de 30 a 60 segundos; a mesma chave consultada de novo em até 24 h volta do cache na hora (`cached: true`) e também é cobrada. Cobra só a NFS-e entregue (mesmo preço do XML de NF-e sem certificado). Chave inválida, nota não encontrada e falha não são cobradas.",
         "operationId": "consultar_nfse_endpoint_api_consultar_nfse_get",
         "parameters": [
           {
