@@ -16,7 +16,7 @@ A coleção também está publicada no Postman: [FiscalAPI na Postman API Networ
 3. Na coleção, abra **Variables** e cole a chave em `apiKey`, na coluna *Current value*.
 4. Envie qualquer requisição. A chave vai no cabeçalho `X-API-Key`.
 
-Conta que nunca assinou plano, com e-mail confirmado e sem recarga, tem 10 consultas grátis por mês, no painel e pela API, em qualquer consulta avulsa (IE em um estado, CNPJ inclusive ao vivo, Simples Nacional, NFS-e, certidões, CNIR, SIGEF e as demais). Cada consulta entregue gasta 1 das 10; erro não gasta. Ficam fora a NF-e sem certificado, a IE e a CND em todos os estados (`/api/consultar-ie-todos`, `/api/consultar-cnd-todos`) e todas as certidões de uma vez (`/api/certidoes-todas`). À parte, 10 XML de NF-e com certificado por mês. Fora disso, ou depois das 10, é preciso plano ou saldo: a API responde `402` (`LIMITE_ATINGIDO`; quando acabam as grátis, com `free_queries_used` e `free_queries_limit`). Sem chave, `403` (`API_KEY_ERROR`). Planos, limites e consumo de créditos estão na [documentação](https://docs.fiscalapi.com.br).
+Pela API, toda consulta pede plano ou saldo de recarga, a partir de R$ 19,99/mês. As 10 consultas grátis do mês são só no painel: teste lá antes de assinar. Sem plano nem saldo, a API responde `402` (`LIMITE_ATINGIDO`). Sem chave, `403` (`API_KEY_ERROR`). Planos, limites e consumo de créditos estão na [documentação](https://docs.fiscalapi.com.br).
 
 ## SDKs
 
