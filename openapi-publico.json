@@ -541,7 +541,7 @@
           "CND Estadual"
         ],
         "summary": "Consultar CND Estadual por UF",
-        "description": "Consulta Certidão Negativa de Débitos Estadual (ICMS) para uma UF específica. Retorna status da certidão e PDF em base64.",
+        "description": "Consulta Certidão Negativa de Débitos Estadual (ICMS) para uma UF específica. Retorna status da certidão e PDF em base64. Com `emitir_nova=true`, vai ao órgão de novo mesmo que a certidão tenha sido consultada nas últimas 24 horas.",
         "operationId": "consultar_cnd_api_consultar_cnd_get",
         "parameters": [
           {
@@ -576,6 +576,18 @@
               "title": "Cnpj"
             },
             "description": "CNPJ do contribuinte"
+          },
+          {
+            "name": "emitir_nova",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Vai ao órgão de novo em vez de devolver a certidão consultada nas últimas 24 horas. Certidão obtida do órgão há até 15 minutos é devolvida sem nova ida. Em MG, a certidão emitida nos últimos 7 dias e ainda válida continua sendo devolvida.",
+              "default": false,
+              "title": "Emitir Nova"
+            },
+            "description": "Vai ao órgão de novo em vez de devolver a certidão consultada nas últimas 24 horas. Certidão obtida do órgão há até 15 minutos é devolvida sem nova ida. Em MG, a certidão emitida nos últimos 7 dias e ainda válida continua sendo devolvida."
           }
         ],
         "responses": {
@@ -1891,7 +1903,7 @@
           "NF-e XML"
         ],
         "summary": "Consultar XML de NF-e por chave, com certificado",
-        "description": "Retorna o XML completo (nfeProc assinado) de UMA NF-e a partir da chave de acesso (44 posicoes; aceita CNPJ alfanumerico do emitente), usando o certificado digital do cliente (e-CPF/e-CNPJ) enviado na requisicao. Uma chave por requisicao. O certificado NAO e armazenado. So retorna a nota quando o titular do certificado e participante (emitente, destinatario, transportador ou autorizado). Cobra só quando retorna XML: nos planos Lite, Starter e Pro, cada XML conta como 3 consultas; no Enterprise, R$ 0,025 por nota, dentro das 10.000 consultas do plano. Chave sem XML não é cobrada.",
+        "description": "Retorna o XML completo (nfeProc assinado) de UMA NF-e a partir da chave de acesso (44 posicoes; aceita CNPJ alfanumerico do emitente), usando o certificado digital do cliente (e-CPF/e-CNPJ) enviado na requisicao. Uma chave por requisicao. O certificado NAO e armazenado. So retorna a nota quando o titular do certificado e participante (emitente, destinatario, transportador ou autorizado). Cobra só quando retorna XML: nos planos Starter e Pro, cada XML conta como 3 consultas; no Enterprise, R$ 0,025 por nota, dentro das 10.000 consultas do plano. Chave sem XML não é cobrada.",
         "operationId": "consultar_nfe_xml_endpoint_api_consultar_nfe_xml_post",
         "requestBody": {
           "required": true,
@@ -3204,10 +3216,7 @@
           },
           "qsa": {
             "items": {
-              "additionalProperties": {
-                "type": "string"
-              },
-              "type": "object"
+              "$ref": "#/components/schemas/SocioQSA"
             },
             "type": "array",
             "title": "Qsa",
@@ -3376,6 +3385,45 @@
             ],
             "title": "Data Exclusao Do Mei",
             "description": "Data do desenquadramento do MEI (YYYY-MM-DD), da base mensal."
+          },
+          "natureza_juridica_codigo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Natureza Juridica Codigo",
+            "description": "Codigo da natureza juridica com 4 digitos (ex.: 2062)."
+          },
+          "ente_federativo_responsavel": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ente Federativo Responsavel",
+            "description": "Ente federativo responsavel, so para orgaos e entidades publicas (ex.: UNIAO)."
+          },
+          "regime_tributario": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/RegimeTributarioAno"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Regime Tributario",
+            "description": "Historico da forma de tributacao por ano (ex.: LUCRO REAL, LUCRO PRESUMIDO), em ordem crescente de ano, da base mensal da Receita Federal. Lista vazia = a base nao tem declaracao para o CNPJ; None = a fonte desta consulta nao informou."
           }
         },
         "type": "object",
@@ -3402,22 +3450,35 @@
               "logradouro": "ROD BR-364 KM 28",
               "municipio": "CUIABA",
               "numero": "S/N",
+              "tipo_logradouro": "RODOVIA",
               "uf": "MT"
             },
             "matriz_filial": "MATRIZ",
             "motivo_situacao_cadastral": "SEM MOTIVO",
             "natureza_juridica": "206-2 - Sociedade Empresaria Limitada",
+            "natureza_juridica_codigo": "2062",
             "nome_fantasia": "FAZENDA BOA VISTA",
             "opcao_pelo_mei": false,
             "opcao_pelo_simples": true,
             "porte": "PEQUENO PORTE",
             "qsa": [
               {
+                "cpf_cnpj": "***123456**",
+                "data_entrada_sociedade": "2010-05-20",
+                "faixa_etaria": "41-50",
                 "nome": "JOAO DA SILVA",
-                "qualificacao": "Socio"
+                "qualificacao": "Socio",
+                "tipo": "PESSOA FISICA"
               }
             ],
             "razao_social": "AGROPECUARIA BOA VISTA LTDA",
+            "regime_tributario": [
+              {
+                "ano": 2024,
+                "forma_de_tributacao": "LUCRO PRESUMIDO",
+                "quantidade_de_escrituracoes": 1
+              }
+            ],
             "situacao_cadastral": "ATIVA",
             "telefones": [
               "6500000000"
@@ -4081,6 +4142,11 @@
             "type": "string",
             "title": "Request Id"
           },
+          "ambiente": {
+            "type": "string",
+            "title": "Ambiente",
+            "default": "producao"
+          },
           "document": {
             "type": "string",
             "title": "Document"
@@ -4098,6 +4164,18 @@
             "type": "boolean",
             "title": "Cached",
             "default": false
+          },
+          "data_atualizacao": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data Atualizacao",
+            "description": "Momento em que os dados foram obtidos na fonte oficial, em ISO 8601 no fuso de Brasília. Em resposta servida do cache (`cached: true`), é o momento da consulta original à fonte."
           },
           "demo": {
             "type": "boolean",
@@ -4123,6 +4201,7 @@
         "examples": [
           {
             "cached": false,
+            "data_atualizacao": "2026-10-23T09:41:12-03:00",
             "document": "12345678909",
             "document_type": "cpf",
             "request_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
@@ -4207,6 +4286,11 @@
             "type": "string",
             "title": "Request Id"
           },
+          "ambiente": {
+            "type": "string",
+            "title": "Ambiente",
+            "default": "producao"
+          },
           "document": {
             "type": "string",
             "title": "Document"
@@ -4246,12 +4330,15 @@
         "title": "CrossStateResponse",
         "examples": [
           {
-            "cached_ufs": [],
+            "cached_ufs": [
+              "RO"
+            ],
             "document": "12345678909",
             "document_type": "cpf",
             "request_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
             "results": [
               {
+                "data_atualizacao": "2026-10-23T09:41:12-03:00",
                 "results": [
                   {
                     "inscricao_estadual": "13.234.567-6",
@@ -4266,6 +4353,7 @@
                 "uf": "MT"
               },
               {
+                "data_atualizacao": "2026-10-22T18:05:47-03:00",
                 "results": [],
                 "source_status": {
                   "status": "success"
@@ -5928,6 +6016,31 @@
           }
         ]
       },
+      "RegimeTributarioAno": {
+        "properties": {
+          "ano": {
+            "type": "integer",
+            "title": "Ano"
+          },
+          "forma_de_tributacao": {
+            "type": "string",
+            "title": "Forma De Tributacao"
+          },
+          "quantidade_de_escrituracoes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quantidade De Escrituracoes"
+          }
+        },
+        "type": "object",
+        "title": "RegimeTributarioAno"
+      },
       "RejeicaoDetailResponse": {
         "properties": {
           "codigo": {
@@ -6070,6 +6183,38 @@
           "results"
         ],
         "title": "RejeicaoListResponse"
+      },
+      "RepresentanteLegal": {
+        "properties": {
+          "nome": {
+            "type": "string",
+            "title": "Nome"
+          },
+          "cpf": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cpf"
+          },
+          "qualificacao": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Qualificacao"
+          }
+        },
+        "type": "object",
+        "title": "RepresentanteLegal"
       },
       "SaldoResponse": {
         "properties": {
@@ -6908,6 +7053,90 @@
         ],
         "title": "SimplesNacionalResponse"
       },
+      "SocioQSA": {
+        "properties": {
+          "nome": {
+            "type": "string",
+            "title": "Nome"
+          },
+          "qualificacao": {
+            "type": "string",
+            "title": "Qualificacao"
+          },
+          "cpf_cnpj": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cpf Cnpj"
+          },
+          "tipo": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "PESSOA FISICA",
+                  "PESSOA JURIDICA",
+                  "ESTRANGEIRO"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tipo"
+          },
+          "data_entrada_sociedade": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data Entrada Sociedade"
+          },
+          "faixa_etaria": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Faixa Etaria"
+          },
+          "pais": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pais"
+          },
+          "representante_legal": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RepresentanteLegal"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "title": "SocioQSA"
+      },
       "SourceStatus": {
         "properties": {
           "status": {
@@ -6998,6 +7227,18 @@
           "source_status": {
             "$ref": "#/components/schemas/SourceStatus"
           },
+          "data_atualizacao": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data Atualizacao",
+            "description": "Momento em que os dados desta UF foram obtidos na fonte oficial, em ISO 8601 no fuso de Brasília. Em UF servida do cache (listada em `cached_ufs`), é o momento da consulta original. `null` quando a UF não foi consultada ou falhou."
+          },
           "results": {
             "items": {
               "$ref": "#/components/schemas/IEResult"
@@ -7015,6 +7256,7 @@
         "title": "UFIEResult",
         "examples": [
           {
+            "data_atualizacao": "2026-10-23T09:41:12-03:00",
             "results": [
               {
                 "inscricao_estadual": "13.234.567-6",
