@@ -16,7 +16,7 @@ A coleção também está publicada no Postman: [FiscalAPI na Postman API Networ
 3. Na coleção, abra **Variables** e cole a chave em `apiKey`, na coluna *Current value*.
 4. Envie qualquer requisição. A chave vai no cabeçalho `X-API-Key`.
 
-Pela API, toda consulta pede plano ou saldo de recarga, a partir de R$ 19,99/mês. As 10 consultas grátis do mês são só no painel: teste lá antes de assinar. Sem plano nem saldo, a API responde `402` (`LIMITE_ATINGIDO`). Sem chave, `403` (`API_KEY_ERROR`). Planos, limites e consumo de créditos estão na [documentação](https://docs.fiscalapi.com.br).
+Pela API, toda consulta pede plano ou saldo de recarga, a partir de R$ 50 por mês. As 10 consultas grátis do mês são só no painel: teste lá antes de assinar. Sem plano nem saldo, a API responde `402` (`LIMITE_ATINGIDO`). Sem chave, `403` (`API_KEY_ERROR`). Planos, limites e consumo de créditos estão na [documentação](https://docs.fiscalapi.com.br).
 
 ## SDKs
 
