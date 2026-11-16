@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "a502c70e-5ed7-54dd-9642-eda948b8f723",
     "name": "FiscalAPI",
-    "description": "API REST de consultas fiscais e cadastrais do Brasil, com foco no agronegócio: inscrição estadual nas 27 UFs, CNPJ, certidões estaduais e federais, XML de NF-e por chave, imóveis rurais (SIGEF e CNIR) e perfil consolidado do produtor rural. Respostas em JSON.\n\n**Autenticação:** envie sua chave no header `X-API-Key` (formato `fapi_...`). Crie a conta e copie a chave em https://app.fiscalapi.com.br. Nunca exponha a chave no front-end.\n\n**Cobrança:** cada consulta com dado consome créditos do plano (1 na maioria; 3 no CNPJ ao vivo; NF-e conforme o plano). Erros não são cobrados. Erros da origem do dado vêm com HTTP 200 em `source_status` (também não cobrados).\n\n**Plano ou recarga:** pela API, toda consulta pede plano (a partir de R$ 50 por mês) ou saldo de recarga. As 10 consultas grátis do mês são só no painel (https://app.fiscalapi.com.br): teste lá antes de assinar. Sem plano nem saldo, o 402 é `LIMITE_ATINGIDO`.\n\n**Limites:** franquia mensal por conta e limite de requisições por minuto conforme o plano (Starter 20, Pro 60, Enterprise 120; conta sem plano, 5). Ao exceder: HTTP 402 `LIMITE_ATINGIDO` (saldo) ou HTTP 429 `RATE_LIMIT_EXCEEDED` (com `Retry-After`).\n\n**Erros:** formato RFC 7807 (`application/problem+json`) com `title` = código do erro e `request_id` para o suporte.\n\nDocumentação completa: https://docs.fiscalapi.com.br\n\n## Como usar\n1. Em **Variables** da coleção, cole sua chave em `apiKey` (fica só no seu Postman).\n2. Abra uma pasta, escolha a requisição e clique em **Send**.\n3. Veja respostas de exemplo em **Examples** de cada requisição.\n\nOs exemplos usam documentos fictícios (CNPJ 12.345.678/0001-95). Troque pelo documento que você quer consultar.",
+    "description": "API REST de consultas fiscais e cadastrais do Brasil, com foco no agronegócio: inscrição estadual nas 27 UFs, CNPJ, certidões estaduais e federais, XML de NF-e e de CT-e por chave, imóveis rurais (SIGEF e CNIR) e perfil consolidado do produtor rural. Respostas em JSON.\n\n**Autenticação:** envie sua chave no header `X-API-Key` (formato `fapi_...`). Crie a conta e copie a chave em https://app.fiscalapi.com.br. Nunca exponha a chave no front-end.\n\n**Cobrança:** cada consulta com dado consome créditos do plano (1 na maioria; 3 no CNPJ ao vivo; NF-e conforme o plano). Erros não são cobrados. Erros da origem do dado vêm com HTTP 200 em `source_status` (também não cobrados).\n\n**Plano ou recarga:** pela API, toda consulta pede plano (a partir de R$ 50 por mês) ou saldo de recarga. As 10 consultas grátis do mês são só no painel (https://app.fiscalapi.com.br): teste lá antes de assinar. Sem plano nem saldo, o 402 é `LIMITE_ATINGIDO`.\n\n**Limites:** franquia mensal por conta e limite de requisições por minuto conforme o plano (Starter 20, Pro 60, Enterprise 120; conta sem plano, 5). Ao exceder: HTTP 402 `LIMITE_ATINGIDO` (saldo) ou HTTP 429 `RATE_LIMIT_EXCEEDED` (com `Retry-After`).\n\n**Erros:** formato RFC 7807 (`application/problem+json`) com `title` = código do erro e `request_id` para o suporte.\n\nDocumentação completa: https://docs.fiscalapi.com.br\n\n## Como usar\n1. Em **Variables** da coleção, cole sua chave em `apiKey` (fica só no seu Postman).\n2. Abra uma pasta, escolha a requisição e clique em **Send**.\n3. Veja respostas de exemplo em **Examples** de cada requisição.\n\nOs exemplos usam documentos fictícios (CNPJ 12.345.678/0001-95). Troque pelo documento que você quer consultar.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -42,6 +42,12 @@
       "value": "",
       "type": "string",
       "description": "Chave de acesso da NF-e (44 dígitos)."
+    },
+    {
+      "key": "chaveCte",
+      "value": "",
+      "type": "string",
+      "description": "Chave de acesso do CT-e, CT-e OS ou GTV-e (44 dígitos)."
     },
     {
       "key": "certificadoBase64",
@@ -1474,6 +1480,228 @@
               ],
               "cookie": [],
               "body": "{\n  \"type\": \"urn:fiscalapi:error:parametro_ausente\",\n  \"title\": \"PARAMETRO_AUSENTE\",\n  \"status\": 400,\n  \"detail\": \"Informe a chave de acesso\",\n  \"instance\": \"https://api.fiscalapi.com.br/api/consultar-nfe-xml\",\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"timestamp\": \"2026-10-20T13:00:00+00:00\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Baixar XML do CT-e por chave de acesso",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/consultar-cte-xml",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "consultar-cte-xml"
+              ]
+            },
+            "description": "Retorna o **XML completo e autorizado** (cteProc, com protocolo de autorização e assinatura) de **um** CT-e, CT-e OS ou GTV-e a partir da chave de acesso de 44 dígitos, usando o certificado digital A1 (e-CPF/e-CNPJ) enviado no corpo. Uma chave por requisição.\n\n**Zero custódia:** o certificado e a senha são usados só durante a consulta e descartados; nunca são gravados. O documento só é entregue se o titular do certificado for participante (emitente, tomador, remetente, destinatário, expedidor ou recebedor).\n\n**Cobrança:** só quando retorna XML (`status: ok`): 3 créditos nos planos Starter e Pro; 1 no Enterprise. Qualquer outro status não é cobrado.\n\nDocumentação: https://docs.fiscalapi.com.br/docs/cte/consultar-cte-xml",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"chave\": \"{{chaveCte}}\",\n  \"certificado\": \"{{certificadoBase64}}\",\n  \"senha\": \"{{senhaCertificado}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "200 - Sucesso",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/consultar-cte-xml",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "consultar-cte-xml"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"chave\": \"51261011222333000181570010000001231123456784\",\n  \"certificado\": \"MIIKcQIBAzCCCjcGCSqGSIb3DQEHAaCCCigEggokMIIK...\",\n  \"senha\": \"senha-do-certificado\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"chave\": \"51261011222333000181570010000001231123456784\",\n  \"status\": \"ok\",\n  \"xml\": \"<cteProc versao=\\\"4.00\\\" xmlns=\\\"http://www.portalfiscal.inf.br/cte\\\">...</cteProc>\",\n  \"mensagem\": \"\",\n  \"creditos_cobrados\": 3\n}"
+            },
+            {
+              "name": "200 - Não encontrado",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/consultar-cte-xml",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "consultar-cte-xml"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"chave\": \"51261011222333000181570010000001231123456784\",\n  \"certificado\": \"MIIKcQIBAzCCCjcGCSqGSIb3DQEHAaCCCigEggokMIIK...\",\n  \"senha\": \"senha-do-certificado\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"chave\": \"51261011222333000181570010000001231123456784\",\n  \"status\": \"nao_encontrado\",\n  \"xml\": null,\n  \"mensagem\": \"Este CT-e não está disponível para download.\",\n  \"creditos_cobrados\": 0\n}"
+            },
+            {
+              "name": "400 - PARAMETRO_AUSENTE",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/consultar-cte-xml",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "consultar-cte-xml"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"chave\": \"\",\n  \"certificado\": \"MIIKcQIBAzCCCjcGCSqGSIb3DQEHAaCCCigEggokMIIK...\",\n  \"senha\": \"senha-do-certificado\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/problem+json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"type\": \"urn:fiscalapi:error:parametro_ausente\",\n  \"title\": \"PARAMETRO_AUSENTE\",\n  \"status\": 400,\n  \"detail\": \"Informe a chave de acesso\",\n  \"instance\": \"https://api.fiscalapi.com.br/api/consultar-cte-xml\",\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"timestamp\": \"2026-11-15T13:00:00+00:00\"\n}"
+            },
+            {
+              "name": "400 - CHAVE_INVALIDA (chave de NF-e)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/consultar-cte-xml",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "consultar-cte-xml"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"chave\": \"35261011222333000181550010000001231123456783\",\n  \"certificado\": \"MIIKcQIBAzCCCjcGCSqGSIb3DQEHAaCCCigEggokMIIK...\",\n  \"senha\": \"senha-do-certificado\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/problem+json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"type\": \"urn:fiscalapi:error:chave_invalida\",\n  \"title\": \"CHAVE_INVALIDA\",\n  \"status\": 400,\n  \"detail\": \"Esta consulta aceita apenas chaves de CT-e, CT-e OS ou GTV-e\",\n  \"instance\": \"https://api.fiscalapi.com.br/api/consultar-cte-xml\",\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"timestamp\": \"2026-11-15T13:00:00+00:00\"\n}"
             }
           ]
         },

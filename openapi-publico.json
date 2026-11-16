@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "FiscalAPI",
-    "description": "API REST da FiscalAPI para consultar inscrição estadual (IE) nos 27 estados, CNPJ, certidões negativas estaduais e federais, XML de NF-e pela chave de acesso, NFS-e do padrão nacional pela chave de acesso, imóveis rurais (CNIR e SIGEF), Simples Nacional, status da SEFAZ e o catálogo de rejeições da NF-e.\n\nAutenticação: envie a sua chave no cabeçalho `X-API-Key`. A chave é criada no painel (app.fiscalapi.com.br); sem ela, ou com chave inválida, a resposta é 403.\n\nCobrança: as consultas usam o saldo do plano. Sem plano ou saldo, a chamada devolve 402. Para testar antes de assinar, use as 10 consultas grátis do mês no painel. Limite por minuto conforme o plano; acima dele, 429 com o cabeçalho Retry-After.\n\nDocumentação completa: https://docs.fiscalapi.com.br",
+    "description": "API REST da FiscalAPI para consultar inscrição estadual (IE) nos 27 estados, CNPJ, certidões negativas estaduais e federais, XML de NF-e e de CT-e pela chave de acesso, NFS-e do padrão nacional pela chave de acesso, imóveis rurais (CNIR e SIGEF), Simples Nacional, status da SEFAZ e o catálogo de rejeições da NF-e.\n\nAutenticação: envie a sua chave no cabeçalho `X-API-Key`. A chave é criada no painel (app.fiscalapi.com.br); sem ela, ou com chave inválida, a resposta é 403.\n\nCobrança: as consultas usam o saldo do plano. Sem plano ou saldo, a chamada devolve 402. Para testar antes de assinar, use as 10 consultas grátis do mês no painel. Limite por minuto conforme o plano; acima dele, 429 com o cabeçalho Retry-After.\n\nDocumentação completa: https://docs.fiscalapi.com.br",
     "version": "1.0.0"
   },
   "servers": [
@@ -91,7 +91,7 @@
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou compre créditos extras.",
             "content": {
               "application/json": {
                 "schema": {
@@ -219,7 +219,7 @@
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou compre créditos extras.",
             "content": {
               "application/json": {
                 "schema": {
@@ -355,7 +355,7 @@
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou compre créditos extras.",
             "content": {
               "application/json": {
                 "schema": {
@@ -409,121 +409,6 @@
           },
           "500": {
             "description": "Erro interno do servidor",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErroProblema"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/perfil-produtor": {
-      "get": {
-        "tags": [
-          "Enriquecimento"
-        ],
-        "summary": "Perfil Completo do Produtor",
-        "description": "Gera perfil consolidado do produtor rural combinando inscrições estaduais de todos os estados suportados. Se informado CNPJ, também consulta dados da Receita Federal.",
-        "operationId": "perfil_produtor_api_perfil_produtor_get",
-        "parameters": [
-          {
-            "name": "cpf",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "title": "Cpf"
-            }
-          },
-          {
-            "name": "cnpj",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "title": "Cnpj"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProducerProfile"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Parâmetro ausente",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErroProblema"
-                }
-              }
-            }
-          },
-          "402": {
-            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErroLimite"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Chave ausente, inválida ou revogada.",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErroProblema"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Limite de requisições por minuto excedido. Veja o cabeçalho Retry-After.",
-            "headers": {
-              "Retry-After": {
-                "description": "Segundos até poder tentar de novo.",
-                "schema": {
-                  "type": "integer"
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErroLimite"
-                }
-              },
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErroProblema"
-                }
-              }
-            }
-          },
-          "502": {
-            "description": "Todas as fontes de dados falharam",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -612,7 +497,7 @@
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou compre créditos extras.",
             "content": {
               "application/json": {
                 "schema": {
@@ -731,7 +616,7 @@
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou compre créditos extras.",
             "content": {
               "application/json": {
                 "schema": {
@@ -850,7 +735,7 @@
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou compre créditos extras.",
             "content": {
               "application/json": {
                 "schema": {
@@ -969,7 +854,7 @@
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou compre créditos extras.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1100,7 +985,7 @@
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou compre créditos extras.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1219,7 +1104,7 @@
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou compre créditos extras.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1350,7 +1235,7 @@
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou compre créditos extras.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1465,7 +1350,7 @@
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou compre créditos extras.",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -1573,7 +1458,7 @@
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou compre créditos extras.",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -1712,7 +1597,7 @@
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou compre créditos extras.",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -1832,7 +1717,7 @@
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou compre créditos extras.",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -1927,7 +1812,7 @@
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou compre créditos extras.",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -1988,7 +1873,7 @@
           "NF-e XML"
         ],
         "summary": "Consultar XML de NF-e por chave, sem certificado",
-        "description": "Retorna o XML de UMA NF-e (modelo 55) a partir da chave de acesso, sem certificado digital. O XML é uma versão para leitura (`tipo_xml` = `leitura`, `assinado` = false): traz os dados da nota, mas não serve para validação de schema nem de assinatura. Para o XML assinado, use /api/consultar-nfe-xml, com certificado. Cobra o XML entregue e também a chave consultada cuja nota não foi encontrada (`nao_encontrado`). Chave inválida, `erro` e a mesma chave repetida logo depois de um `nao_encontrado` não são cobrados. Precisa de plano ou recarga.",
+        "description": "Retorna o XML de UMA NF-e (modelo 55) a partir da chave de acesso, sem certificado digital. O XML é uma versão para leitura (`tipo_xml` = `leitura`, `assinado` = false): traz os dados da nota, mas não serve para validação de schema nem de assinatura. Para o XML assinado, use /api/consultar-nfe-xml, com certificado. Cobra o XML entregue e também a chave consultada cuja nota não foi encontrada (`nao_encontrado`). Chave inválida, `erro` e a mesma chave repetida logo depois de um `nao_encontrado` não são cobrados. Precisa de plano ou de créditos extras.",
         "operationId": "consultar_nfe_xml_sem_certificado_endpoint_api_consultar_nfe_xml_sem_certificado_post",
         "requestBody": {
           "required": true,
@@ -2012,7 +1897,7 @@
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou compre créditos extras.",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -2129,7 +2014,7 @@
             }
           },
           "402": {
-            "description": "Saldo insuficiente para esta consulta. Assine um plano ou recarregue.",
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou compre créditos extras.",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -2159,7 +2044,7 @@
             }
           },
           "409": {
-            "description": "Aceite da versão vigente dos Termos pendente",
+            "description": "Aceite dos Termos de Uso pendente na conta",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -2214,6 +2099,91 @@
           "503": {
             "description": "Consulta temporariamente indisponível (header Retry-After)",
             "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/consultar-cte-xml": {
+      "post": {
+        "tags": [
+          "CT-e XML"
+        ],
+        "summary": "Consultar XML de CT-e por chave, com certificado",
+        "description": "Retorna o XML completo de UM CT-e, CT-e OS ou GTV-e a partir da chave de acesso (44 posicoes; aceita CNPJ alfanumerico do emitente), usando o certificado digital do cliente (e-CPF/e-CNPJ) enviado na requisicao. O certificado NAO e armazenado. So retorna o documento quando o titular do certificado e participante. Cobra so quando retorna XML, no mesmo valor do XML de NF-e com certificado. Chave sem XML nao e cobrada.",
+        "operationId": "consultar_cte_xml_endpoint_api_consultar_cte_xml_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CteXmlRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CteXmlResponse"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou compre créditos extras.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Chave ausente, inválida ou revogada.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de requisições por minuto excedido. Veja o cabeçalho Retry-After.",
+            "headers": {
+              "Retry-After": {
+                "description": "Segundos até poder tentar de novo.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroLimite"
+                }
+              },
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErroProblema"
@@ -2514,7 +2484,7 @@
           "Saldo"
         ],
         "summary": "Consultar saldo restante",
-        "description": "Retorna quanto o saldo da conta ainda rende, em consultas e em notas fiscais (XML de NF-e). As duas formas dividem o mesmo saldo: gastar notas reduz as consultas restantes e vice-versa. Não consome crédito.",
+        "description": "Retorna quanto o saldo da conta ainda rende, em consultas e em notas fiscais (XML de NF-e). As duas formas dividem o mesmo saldo: gastar notas reduz as consultas restantes e vice-versa. `creditos` traz o mesmo saldo em créditos (1 crédito = R$ 1). Não consome crédito.",
         "operationId": "consultar_saldo_api_saldo_get",
         "responses": {
           "200": {
@@ -2576,224 +2546,6 @@
   },
   "components": {
     "schemas": {
-      "CADINRegistro": {
-        "properties": {
-          "orgao_credor": {
-            "type": "string",
-            "title": "Orgao Credor",
-            "default": ""
-          },
-          "valor_debito": {
-            "type": "string",
-            "title": "Valor Debito",
-            "default": ""
-          },
-          "data_inscricao": {
-            "type": "string",
-            "title": "Data Inscricao",
-            "default": ""
-          },
-          "tipo_pendencia": {
-            "type": "string",
-            "title": "Tipo Pendencia",
-            "default": ""
-          }
-        },
-        "type": "object",
-        "title": "CADINRegistro"
-      },
-      "CADINResponse": {
-        "properties": {
-          "request_id": {
-            "type": "string",
-            "title": "Request Id"
-          },
-          "document": {
-            "type": "string",
-            "title": "Document"
-          },
-          "document_type": {
-            "type": "string",
-            "title": "Document Type"
-          },
-          "cached": {
-            "type": "boolean",
-            "title": "Cached",
-            "default": false
-          },
-          "source_status": {
-            "$ref": "#/components/schemas/SourceStatus"
-          },
-          "result": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/CADINResult"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          }
-        },
-        "type": "object",
-        "required": [
-          "request_id",
-          "document",
-          "document_type",
-          "source_status"
-        ],
-        "title": "CADINResponse"
-      },
-      "CADINResult": {
-        "properties": {
-          "inscrito": {
-            "type": "boolean",
-            "title": "Inscrito"
-          },
-          "total_pendencias": {
-            "type": "integer",
-            "title": "Total Pendencias",
-            "default": 0
-          },
-          "registros": {
-            "items": {
-              "$ref": "#/components/schemas/CADINRegistro"
-            },
-            "type": "array",
-            "title": "Registros",
-            "default": []
-          }
-        },
-        "type": "object",
-        "required": [
-          "inscrito"
-        ],
-        "title": "CADINResult"
-      },
-      "CARRegistro": {
-        "properties": {
-          "numero_car": {
-            "type": "string",
-            "title": "Numero Car",
-            "default": ""
-          },
-          "municipio": {
-            "type": "string",
-            "title": "Municipio",
-            "default": ""
-          },
-          "uf": {
-            "type": "string",
-            "title": "Uf",
-            "default": ""
-          },
-          "area_imovel_ha": {
-            "type": "number",
-            "title": "Area Imovel Ha",
-            "default": 0.0
-          },
-          "area_reserva_legal_ha": {
-            "type": "number",
-            "title": "Area Reserva Legal Ha",
-            "default": 0.0
-          },
-          "area_app_ha": {
-            "type": "number",
-            "title": "Area App Ha",
-            "default": 0.0
-          },
-          "area_vegetacao_nativa_ha": {
-            "type": "number",
-            "title": "Area Vegetacao Nativa Ha",
-            "default": 0.0
-          },
-          "status": {
-            "type": "string",
-            "title": "Status",
-            "default": ""
-          }
-        },
-        "type": "object",
-        "title": "CARRegistro"
-      },
-      "CARResponse": {
-        "properties": {
-          "request_id": {
-            "type": "string",
-            "title": "Request Id"
-          },
-          "document": {
-            "type": "string",
-            "title": "Document"
-          },
-          "document_type": {
-            "type": "string",
-            "title": "Document Type"
-          },
-          "cached": {
-            "type": "boolean",
-            "title": "Cached",
-            "default": false
-          },
-          "source_status": {
-            "$ref": "#/components/schemas/SourceStatus"
-          },
-          "result": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/CARResult"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          }
-        },
-        "type": "object",
-        "required": [
-          "request_id",
-          "document",
-          "document_type",
-          "source_status"
-        ],
-        "title": "CARResponse"
-      },
-      "CARResult": {
-        "properties": {
-          "tem_car": {
-            "type": "boolean",
-            "title": "Tem Car"
-          },
-          "total_registros": {
-            "type": "integer",
-            "title": "Total Registros",
-            "default": 0
-          },
-          "area_total_ha": {
-            "type": "number",
-            "title": "Area Total Ha",
-            "default": 0.0
-          },
-          "area_vegetacao_total_ha": {
-            "type": "number",
-            "title": "Area Vegetacao Total Ha",
-            "default": 0.0
-          },
-          "registros": {
-            "items": {
-              "$ref": "#/components/schemas/CARRegistro"
-            },
-            "type": "array",
-            "title": "Registros",
-            "default": []
-          }
-        },
-        "type": "object",
-        "required": [
-          "tem_car"
-        ],
-        "title": "CARResult"
-      },
       "CNDResponse": {
         "properties": {
           "request_id": {
@@ -4223,6 +3975,38 @@
           }
         ]
       },
+      "CreditosDaConta": {
+        "properties": {
+          "plano": {
+            "type": "number",
+            "title": "Plano",
+            "description": "Créditos do plano que ainda restam no mês. 1 crédito = R$ 1."
+          },
+          "extras": {
+            "type": "number",
+            "title": "Extras",
+            "description": "Créditos extras, comprados à parte. Não vencem."
+          },
+          "guardados": {
+            "type": "number",
+            "title": "Guardados",
+            "description": "Créditos guardados: créditos do plano que sobraram quando o plano venceu; voltam ao assinar um plano. Até lá não pagam consultas."
+          },
+          "disponivel": {
+            "type": "number",
+            "title": "Disponivel",
+            "description": "Créditos que pagam consultas agora: plano + extras."
+          }
+        },
+        "type": "object",
+        "required": [
+          "plano",
+          "extras",
+          "guardados",
+          "disponivel"
+        ],
+        "title": "CreditosDaConta"
+      },
       "CrossStateCNDResponse": {
         "properties": {
           "request_id": {
@@ -4364,163 +4148,82 @@
           }
         ]
       },
-      "EmbargoIbamaRegistro": {
+      "CteXmlRequest": {
         "properties": {
-          "seq_tad": {
+          "chave": {
             "type": "string",
-            "title": "Seq Tad"
+            "title": "Chave",
+            "description": "Chave de acesso do CT-e, CT-e OS ou GTV-e (44 posicoes). Aceita CNPJ alfanumerico do emitente; separadores sao ignorados."
           },
-          "num_processo": {
+          "certificado": {
             "type": "string",
-            "title": "Num Processo"
+            "maxLength": 140000,
+            "title": "Certificado",
+            "description": "Binario do .pfx em base64 (ate 100 KB)"
           },
-          "natureza": {
+          "senha": {
             "type": "string",
-            "title": "Natureza"
-          },
-          "area_embargada_ha": {
-            "type": "number",
-            "title": "Area Embargada Ha"
-          },
-          "data_embargo": {
-            "type": "string",
-            "title": "Data Embargo"
-          },
-          "data_desembargo": {
-            "type": "string",
-            "title": "Data Desembargo",
-            "default": ""
-          },
-          "status": {
-            "type": "string",
-            "title": "Status"
-          },
-          "municipio": {
-            "type": "string",
-            "title": "Municipio"
-          },
-          "uf": {
-            "type": "string",
-            "title": "Uf"
-          },
-          "nome_imovel": {
-            "type": "string",
-            "title": "Nome Imovel"
-          },
-          "latitude": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Latitude"
-          },
-          "longitude": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Longitude"
+            "title": "Senha",
+            "description": "Senha do certificado"
           }
         },
         "type": "object",
         "required": [
-          "seq_tad",
-          "num_processo",
-          "natureza",
-          "area_embargada_ha",
-          "data_embargo",
-          "status",
-          "municipio",
-          "uf",
-          "nome_imovel"
+          "chave",
+          "certificado",
+          "senha"
         ],
-        "title": "EmbargoIbamaRegistro"
+        "title": "CteXmlRequest"
       },
-      "EmbargoIbamaResponse": {
+      "CteXmlResponse": {
         "properties": {
           "request_id": {
             "type": "string",
-            "title": "Request Id"
+            "title": "Request Id",
+            "default": ""
           },
-          "document": {
+          "chave": {
             "type": "string",
-            "title": "Document"
+            "title": "Chave"
           },
-          "document_type": {
+          "status": {
             "type": "string",
-            "title": "Document Type"
+            "enum": [
+              "ok",
+              "nao_autorizado",
+              "nao_encontrado",
+              "erro"
+            ],
+            "title": "Status"
           },
-          "source_status": {
-            "$ref": "#/components/schemas/SourceStatus"
-          },
-          "result": {
+          "xml": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/EmbargoIbamaResult"
+                "type": "string"
               },
               {
                 "type": "null"
               }
-            ]
-          }
-        },
-        "type": "object",
-        "required": [
-          "request_id",
-          "document",
-          "document_type",
-          "source_status"
-        ],
-        "title": "EmbargoIbamaResponse"
-      },
-      "EmbargoIbamaResult": {
-        "properties": {
-          "tem_embargos": {
-            "type": "boolean",
-            "title": "Tem Embargos"
+            ],
+            "title": "Xml"
           },
-          "total_embargos": {
-            "type": "integer",
-            "title": "Total Embargos",
-            "default": 0
-          },
-          "total_embargos_ativos": {
-            "type": "integer",
-            "title": "Total Embargos Ativos",
-            "default": 0
-          },
-          "area_total_embargada_ha": {
-            "type": "number",
-            "title": "Area Total Embargada Ha",
-            "default": 0.0
-          },
-          "ultima_atualizacao": {
+          "mensagem": {
             "type": "string",
-            "title": "Ultima Atualizacao",
+            "title": "Mensagem",
             "default": ""
           },
-          "registros": {
-            "items": {
-              "$ref": "#/components/schemas/EmbargoIbamaRegistro"
-            },
-            "type": "array",
-            "title": "Registros",
-            "default": []
+          "creditos_cobrados": {
+            "type": "integer",
+            "title": "Creditos Cobrados",
+            "default": 0
           }
         },
         "type": "object",
         "required": [
-          "tem_embargos"
+          "chave",
+          "status"
         ],
-        "title": "EmbargoIbamaResult"
+        "title": "CteXmlResponse"
       },
       "ErroLimite": {
         "type": "object",
@@ -4553,7 +4256,7 @@
           },
           "cost": {
             "type": "integer",
-            "description": "Créditos que esta consulta custaria."
+            "description": "Unidade antiga, mantida por compatibilidade: quantas consultas do saldo esta consulta gastaria. Para o preço em R$ use `preco`; para o saldo, `creditos`."
           },
           "consultas_restantes": {
             "type": [
@@ -4561,6 +4264,45 @@
               "null"
             ],
             "description": "Quantas consultas deste tipo o saldo ainda paga."
+          },
+          "creditos": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "description": "Saldo em créditos (1 crédito = R$ 1): plano, extras, guardados e disponivel (plano + extras; os guardados só voltam com um plano).",
+            "properties": {
+              "plano": {
+                "type": "number"
+              },
+              "extras": {
+                "type": "number"
+              },
+              "guardados": {
+                "type": "number"
+              },
+              "disponivel": {
+                "type": "number"
+              }
+            }
+          },
+          "preco": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "description": "Preço em R$ de uma consulta deste tipo: com os créditos do plano (null sem plano) e com os créditos extras.",
+            "properties": {
+              "plano": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "extras": {
+                "type": "number"
+              }
+            }
           },
           "retry_after": {
             "type": "integer",
@@ -4619,13 +4361,52 @@
           },
           "cost": {
             "type": "integer",
-            "description": "Créditos que esta consulta custaria."
+            "description": "Unidade antiga, mantida por compatibilidade: quantas consultas do saldo esta consulta gastaria. Para o preço em R$ use `preco`; para o saldo, `creditos`."
           },
           "consultas_restantes": {
             "type": [
               "integer",
               "null"
             ]
+          },
+          "creditos": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "description": "Saldo em créditos (1 crédito = R$ 1): plano, extras, guardados e disponivel (plano + extras; os guardados só voltam com um plano).",
+            "properties": {
+              "plano": {
+                "type": "number"
+              },
+              "extras": {
+                "type": "number"
+              },
+              "guardados": {
+                "type": "number"
+              },
+              "disponivel": {
+                "type": "number"
+              }
+            }
+          },
+          "preco": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "description": "Preço em R$ de uma consulta deste tipo: com os créditos do plano (null sem plano) e com os créditos extras.",
+            "properties": {
+              "plano": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "extras": {
+                "type": "number"
+              }
+            }
           },
           "retry_after": {
             "type": "integer",
@@ -4853,122 +4634,6 @@
             "uf_ie": "MT"
           }
         ]
-      },
-      "ListaSujaRegistro": {
-        "properties": {
-          "razao_social": {
-            "type": "string",
-            "title": "Razao Social"
-          },
-          "uf": {
-            "type": "string",
-            "title": "Uf"
-          },
-          "municipio": {
-            "type": "string",
-            "title": "Municipio"
-          },
-          "ano_acao_fiscal": {
-            "type": "integer",
-            "title": "Ano Acao Fiscal"
-          },
-          "data_inclusao": {
-            "type": "string",
-            "title": "Data Inclusao"
-          },
-          "trabalhadores_envolvidos": {
-            "type": "integer",
-            "title": "Trabalhadores Envolvidos"
-          },
-          "cnae": {
-            "type": "string",
-            "title": "Cnae"
-          },
-          "estabelecimento": {
-            "type": "string",
-            "title": "Estabelecimento"
-          }
-        },
-        "type": "object",
-        "required": [
-          "razao_social",
-          "uf",
-          "municipio",
-          "ano_acao_fiscal",
-          "data_inclusao",
-          "trabalhadores_envolvidos",
-          "cnae",
-          "estabelecimento"
-        ],
-        "title": "ListaSujaRegistro"
-      },
-      "ListaSujaResponse": {
-        "properties": {
-          "request_id": {
-            "type": "string",
-            "title": "Request Id"
-          },
-          "document": {
-            "type": "string",
-            "title": "Document"
-          },
-          "document_type": {
-            "type": "string",
-            "title": "Document Type"
-          },
-          "source_status": {
-            "$ref": "#/components/schemas/SourceStatus"
-          },
-          "result": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/ListaSujaResult"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          }
-        },
-        "type": "object",
-        "required": [
-          "request_id",
-          "document",
-          "document_type",
-          "source_status"
-        ],
-        "title": "ListaSujaResponse"
-      },
-      "ListaSujaResult": {
-        "properties": {
-          "presente": {
-            "type": "boolean",
-            "title": "Presente"
-          },
-          "total_registros": {
-            "type": "integer",
-            "title": "Total Registros",
-            "default": 0
-          },
-          "ultima_atualizacao": {
-            "type": "string",
-            "title": "Ultima Atualizacao",
-            "default": ""
-          },
-          "registros": {
-            "items": {
-              "$ref": "#/components/schemas/ListaSujaRegistro"
-            },
-            "type": "array",
-            "title": "Registros",
-            "default": []
-          }
-        },
-        "type": "object",
-        "required": [
-          "presente"
-        ],
-        "title": "ListaSujaResult"
       },
       "NfeXmlRequest": {
         "properties": {
@@ -5874,148 +5539,6 @@
         ],
         "title": "NfseTributoTotal"
       },
-      "ProducerProfile": {
-        "properties": {
-          "request_id": {
-            "type": "string",
-            "title": "Request Id"
-          },
-          "document": {
-            "type": "string",
-            "title": "Document"
-          },
-          "receita_federal": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/CNPJResponse"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "inscricoes_estaduais": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/CrossStateResponse"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "cnd_estaduais": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/CrossStateCNDResponse"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "certidoes_federais": {
-            "items": {
-              "$ref": "#/components/schemas/CertidaoFederalResponse"
-            },
-            "type": "array",
-            "title": "Certidoes Federais",
-            "default": []
-          },
-          "cnir": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/CnirResponse"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "lista_suja": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/ListaSujaResponse"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "embargos_ibama": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/EmbargoIbamaResponse"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "car": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/CARResponse"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "cadin": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/CADINResponse"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          }
-        },
-        "type": "object",
-        "required": [
-          "request_id",
-          "document"
-        ],
-        "title": "ProducerProfile",
-        "examples": [
-          {
-            "document": "12345678000195",
-            "inscricoes_estaduais": {
-              "document": "12345678000195",
-              "document_type": "cnpj",
-              "request_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-              "results": [
-                {
-                  "results": [
-                    {
-                      "inscricao_estadual": "13.234.567-6",
-                      "razao_social": "JOAO DA SILVA FAZENDA SANTA MARIA"
-                    }
-                  ],
-                  "source_status": {
-                    "status": "success"
-                  },
-                  "uf": "MT"
-                }
-              ]
-            },
-            "receita_federal": {
-              "cached": false,
-              "cnpj": "12345678000195",
-              "request_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-              "result": {
-                "razao_social": "AGROPECUARIA BOA VISTA LTDA"
-              },
-              "source_status": {
-                "status": "success"
-              }
-            },
-            "request_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
-          }
-        ]
-      },
       "RegimeTributarioAno": {
         "properties": {
           "ano": {
@@ -6227,18 +5750,36 @@
             "type": "integer",
             "title": "Notas Restantes",
             "description": "Quantos XML de NF-e o saldo ainda paga."
+          },
+          "creditos": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CreditosDaConta"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Saldo em créditos, por parte. Nulo se não puder ser calculado agora."
           }
         },
         "type": "object",
         "required": [
           "consultas_restantes",
-          "notas_restantes"
+          "notas_restantes",
+          "creditos"
         ],
         "title": "SaldoResponse",
         "examples": [
           {
             "consultas_restantes": 1500,
-            "notas_restantes": 500
+            "notas_restantes": 500,
+            "creditos": {
+              "plano": 97.5,
+              "extras": 0.0,
+              "guardados": 0.0,
+              "disponivel": 97.5
+            }
           }
         ]
       },
@@ -7336,7 +6877,7 @@
     },
     {
       "name": "Enriquecimento",
-      "description": "CNPJ, inscrições estaduais em todos os estados e perfil completo do produtor."
+      "description": "CNPJ e inscrições estaduais em todos os estados."
     },
     {
       "name": "CND Estadual",
@@ -7365,6 +6906,10 @@
     {
       "name": "NFS-e",
       "description": "NFS-e do padrão nacional pela chave de acesso, sem certificado digital, com o PDF do DANFSe opcional."
+    },
+    {
+      "name": "CT-e XML",
+      "description": "XML do CT-e, CT-e OS ou GTV-e pela chave de acesso, com o certificado digital de quem participa do documento."
     },
     {
       "name": "Saldo",
