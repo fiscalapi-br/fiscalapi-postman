@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "a502c70e-5ed7-54dd-9642-eda948b8f723",
     "name": "FiscalAPI",
-    "description": "API REST de consultas fiscais e cadastrais do Brasil, com foco no agronegócio: inscrição estadual nas 27 UFs, CNPJ, certidões estaduais e federais, XML de NF-e e de CT-e por chave, imóveis rurais (SIGEF e CNIR) e perfil consolidado do produtor rural. Respostas em JSON.\n\n**Autenticação:** envie sua chave no header `X-API-Key` (formato `fapi_...`). Crie a conta e copie a chave em https://app.fiscalapi.com.br. Nunca exponha a chave no front-end.\n\n**Cobrança:** cada consulta com dado consome créditos do plano (1 na maioria; 3 no CNPJ ao vivo; NF-e conforme o plano). Erros não são cobrados. Erros da origem do dado vêm com HTTP 200 em `source_status` (também não cobrados).\n\n**Plano ou recarga:** pela API, toda consulta pede plano (a partir de R$ 50 por mês) ou saldo de recarga. As 10 consultas grátis do mês são só no painel (https://app.fiscalapi.com.br): teste lá antes de assinar. Sem plano nem saldo, o 402 é `LIMITE_ATINGIDO`.\n\n**Limites:** franquia mensal por conta e limite de requisições por minuto conforme o plano (Starter 20, Pro 60, Enterprise 120; conta sem plano, 5). Ao exceder: HTTP 402 `LIMITE_ATINGIDO` (saldo) ou HTTP 429 `RATE_LIMIT_EXCEEDED` (com `Retry-After`).\n\n**Erros:** formato RFC 7807 (`application/problem+json`) com `title` = código do erro e `request_id` para o suporte.\n\nDocumentação completa: https://docs.fiscalapi.com.br\n\n## Como usar\n1. Em **Variables** da coleção, cole sua chave em `apiKey` (fica só no seu Postman).\n2. Abra uma pasta, escolha a requisição e clique em **Send**.\n3. Veja respostas de exemplo em **Examples** de cada requisição.\n\nOs exemplos usam documentos fictícios (CNPJ 12.345.678/0001-95). Troque pelo documento que você quer consultar.",
+    "description": "API REST de consultas fiscais e cadastrais do Brasil, com foco no agronegócio: inscrição estadual nas 27 UFs, CNPJ, certidões estaduais e federais, XML de NF-e e de CT-e por chave, DIFAL de saída por UF de destino, imóveis rurais (SIGEF e CNIR) e perfil consolidado do produtor rural. Respostas em JSON.\n\n**Autenticação:** envie sua chave no header `X-API-Key` (formato `fapi_...`). Crie a conta e copie a chave em https://app.fiscalapi.com.br. Nunca exponha a chave no front-end.\n\n**Cobrança:** cada consulta com dado consome créditos do plano (1 na maioria; 3 no CNPJ ao vivo; NF-e conforme o plano). Erros não são cobrados. Erros da origem do dado vêm com HTTP 200 em `source_status` (também não cobrados).\n\n**Plano ou recarga:** pela API, toda consulta pede plano (a partir de R$ 50 por mês) ou saldo de recarga. As 10 consultas grátis do mês são só no painel (https://app.fiscalapi.com.br): teste lá antes de assinar. Sem plano nem saldo, o 402 é `LIMITE_ATINGIDO`.\n\n**Limites:** franquia mensal por conta e limite de requisições por minuto conforme o plano (Starter 20, Pro 60, Enterprise 120; conta sem plano, 5). Ao exceder: HTTP 402 `LIMITE_ATINGIDO` (saldo) ou HTTP 429 `RATE_LIMIT_EXCEEDED` (com `Retry-After`).\n\n**Erros:** formato RFC 7807 (`application/problem+json`) com `title` = código do erro e `request_id` para o suporte.\n\nDocumentação completa: https://docs.fiscalapi.com.br\n\n## Como usar\n1. Em **Variables** da coleção, cole sua chave em `apiKey` (fica só no seu Postman).\n2. Abra uma pasta, escolha a requisição e clique em **Send**.\n3. Veja respostas de exemplo em **Examples** de cada requisição.\n\nOs exemplos usam documentos fictícios (CNPJ 12.345.678/0001-95). Troque pelo documento que você quer consultar.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -60,6 +60,12 @@
       "value": "",
       "type": "string",
       "description": "Senha do certificado. Não salve em workspace público."
+    },
+    {
+      "key": "competenciaDifal",
+      "value": "2026-10",
+      "type": "string",
+      "description": "Mês de emissão das notas para o DIFAL de saída (AAAA-MM)."
     }
   ],
   "item": [
@@ -1873,6 +1879,280 @@
               ],
               "cookie": [],
               "body": "{\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"chave\": \"35503082211222333000181000000000012326100000045676\",\n  \"numero_nfse\": \"4567\",\n  \"codigo_municipio_emissor\": \"3550308\",\n  \"data_geracao\": \"2026-10-15T10:30:00-03:00\",\n  \"versao\": \"1.00\",\n  \"dps\": {\n    \"numero\": \"123\",\n    \"serie\": \"1\",\n    \"data_emissao\": \"2026-10-15\"\n  },\n  \"situacao\": {\n    \"codigo\": \"100\",\n    \"descricao\": \"NFS-e Gerada\"\n  },\n  \"emitente\": {\n    \"razao_social\": \"EMPRESA EXEMPLO LTDA\",\n    \"cpf_cnpj\": \"11222333000181\",\n    \"inscricao_municipal\": null,\n    \"situacao_simples_nacional\": null,\n    \"regime_especial_tributacao\": null,\n    \"endereco\": null\n  },\n  \"tomador\": {\n    \"cpf_cnpj\": null,\n    \"inscricao_municipal\": null,\n    \"nome\": \"TOMADOR EXEMPLO\"\n  },\n  \"intermediario\": null,\n  \"servico\": {\n    \"pais\": null,\n    \"municipio\": \"São Paulo\",\n    \"codigo_tributacao_nacional\": null,\n    \"descricao_codigo\": null,\n    \"item_nbs\": null,\n    \"descricao\": \"Serviço de exemplo\"\n  },\n  \"tributacao_municipal\": {\n    \"tributacao_issqn\": null,\n    \"municipio_incidencia\": null,\n    \"valor_servico\": 1000.0,\n    \"desconto_incondicionado\": null,\n    \"deducoes\": null,\n    \"beneficio_municipal\": null,\n    \"base_calculo\": 1000.0,\n    \"aliquota\": 2.5,\n    \"valor_issqn\": 25.0,\n    \"retencao\": null\n  },\n  \"tributacao_federal\": null,\n  \"total_tributos\": [],\n  \"informacoes_complementares\": null,\n  \"ambiente_gerador\": null,\n  \"cached\": false,\n  \"danfse_pdf_base64\": null,\n  \"aviso\": null\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "DIFAL",
+      "description": "DIFAL de saída por UF de destino, com o certificado do emitente (Beta).",
+      "item": [
+        {
+          "name": "Consultar DIFAL de saída por UF de destino (Beta)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/consultar-difal-saida",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "consultar-difal-saida"
+              ]
+            },
+            "description": "**Beta.** Lista, para o mês informado (`competencia`, AAAA-MM), as NF-e do emitente com **DIFAL** (EC 87/2015) e **FCP** destacados para cada UF de destino, a situação da guia de cada nota e o **valor em aberto**. UFs atendidas: AC, AP, DF, GO, MS, MT, RR, RS, SC e SE. `ufs` omitido = as 10.\n\n**Certificado:** A1 (e-CNPJ ou e-CPF) do **emitente** das notas, em base64. Zero custódia: usado só durante a consulta e descartado.\n\n**Em aberto × a conferir:** só `paga` quita. `sem_guia_no_portal`, `pendente_pagamento` e `geracao_rejeitada` somam em `valor_em_aberto`; guia existente sem pagamento confirmado soma em `valor_a_conferir`. Guia emitida fora do portal (ERP, Portal GNRE) e o recolhimento mensal de quem tem IE na UF de destino não aparecem (a nota sai `sem_guia_no_portal`).\n\n**Cobrança:** 1 consulta por UF com `status: ok`. UF `parcial`, `erro` ou `nao_consultada` não é cobrada. `completo: true` só quando todas as UFs vieram `ok`. Pode levar cerca de 70 s.\n\nDocumentação: https://docs.fiscalapi.com.br/docs/difal/consultar-difal-saida",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"certificado\": \"{{certificadoBase64}}\",\n  \"senha\": \"{{senhaCertificado}}\",\n  \"competencia\": \"{{competenciaDifal}}\",\n  \"ufs\": [\"RS\", \"SC\"]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "200 - Sucesso",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/consultar-difal-saida",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "consultar-difal-saida"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"certificado\": \"MIIKcQIBAzCCCjcGCSqGSIb3DQEHAaCCCigEggokMIIK...\",\n  \"senha\": \"senha-do-certificado\",\n  \"competencia\": \"2026-10\",\n  \"ufs\": [\n    \"RS\",\n    \"SC\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"fonte\": \"Portal da DIFAL (SVRS) - Modulo de Apuracao\",\n  \"emitente_tipo\": \"CNPJ\",\n  \"emitente_documento\": \"12345678000195\",\n  \"competencia\": \"2026-10\",\n  \"periodo_inicio\": \"2026-10-01\",\n  \"periodo_fim\": \"2026-10-31\",\n  \"total_documentos\": 3,\n  \"valor_difal\": 650.05,\n  \"valor_fcp\": 80.0,\n  \"valor_em_aberto\": 370.05,\n  \"notas_em_aberto\": 2,\n  \"valor_a_conferir\": 0.0,\n  \"notas_a_conferir\": 0,\n  \"completo\": true,\n  \"ufs\": [\n    {\n      \"uf\": \"RS\",\n      \"status\": \"ok\",\n      \"mensagem\": \"\",\n      \"total_documentos\": 3,\n      \"valor_difal\": 650.05,\n      \"valor_fcp\": 80.0,\n      \"valor_em_aberto\": 370.05,\n      \"notas_em_aberto\": 2,\n      \"valor_a_conferir\": 0.0,\n      \"notas_a_conferir\": 0,\n      \"notas\": [\n        {\n          \"serie\": \"1\",\n          \"numero\": \"1001\",\n          \"data_emissao\": \"2026-10-03\",\n          \"vencimento\": \"2026-10-03\",\n          \"destinatario\": \"MARIA DA SILVA\",\n          \"uf_destino\": \"RS\",\n          \"valor_total\": 1000.0,\n          \"valor_difal\": 100.0,\n          \"valor_fcp\": 20.0,\n          \"situacao_guia_difal\": \"sem_guia_no_portal\",\n          \"situacao_guia_fcp\": \"sem_guia_no_portal\",\n          \"em_aberto\": true,\n          \"valor_em_aberto\": 120.0,\n          \"a_conferir\": false,\n          \"valor_a_conferir\": 0.0\n        },\n        {\n          \"serie\": \"1\",\n          \"numero\": \"1002\",\n          \"data_emissao\": \"2026-10-05\",\n          \"vencimento\": \"2026-10-05\",\n          \"destinatario\": \"JOAO PEREIRA\",\n          \"uf_destino\": \"RS\",\n          \"valor_total\": 2500.0,\n          \"valor_difal\": 250.05,\n          \"valor_fcp\": 0.0,\n          \"situacao_guia_difal\": \"pendente_pagamento\",\n          \"situacao_guia_fcp\": \"nao_se_aplica\",\n          \"em_aberto\": true,\n          \"valor_em_aberto\": 250.05,\n          \"a_conferir\": false,\n          \"valor_a_conferir\": 0.0\n        },\n        {\n          \"serie\": \"1\",\n          \"numero\": \"1003\",\n          \"data_emissao\": \"2026-10-08\",\n          \"vencimento\": \"2026-10-08\",\n          \"destinatario\": \"ANA SOUZA\",\n          \"uf_destino\": \"RS\",\n          \"valor_total\": 3000.0,\n          \"valor_difal\": 300.0,\n          \"valor_fcp\": 60.0,\n          \"situacao_guia_difal\": \"paga\",\n          \"situacao_guia_fcp\": \"paga\",\n          \"em_aberto\": false,\n          \"valor_em_aberto\": 0.0,\n          \"a_conferir\": false,\n          \"valor_a_conferir\": 0.0\n        }\n      ],\n      \"guias\": [\n        {\n          \"numero\": \"2026100000001\",\n          \"vencimento_imposto\": \"2026-10-05\",\n          \"data_limite_pagamento\": \"2026-10-05\",\n          \"uf\": \"RS\",\n          \"tributo\": \"ICMS DIFAL\",\n          \"valor\": 250.05,\n          \"situacao\": \"pendente_pagamento\"\n        },\n        {\n          \"numero\": \"2026100000002\",\n          \"vencimento_imposto\": \"2026-10-08\",\n          \"data_limite_pagamento\": \"2026-10-08\",\n          \"uf\": \"RS\",\n          \"tributo\": \"ICMS DIFAL\",\n          \"valor\": 300.0,\n          \"situacao\": \"paga\"\n        },\n        {\n          \"numero\": \"2026100000003\",\n          \"vencimento_imposto\": \"2026-10-08\",\n          \"data_limite_pagamento\": \"2026-10-08\",\n          \"uf\": \"RS\",\n          \"tributo\": \"FCP\",\n          \"valor\": 60.0,\n          \"situacao\": \"paga\"\n        }\n      ]\n    },\n    {\n      \"uf\": \"SC\",\n      \"status\": \"ok\",\n      \"mensagem\": \"\",\n      \"total_documentos\": 0,\n      \"valor_difal\": 0.0,\n      \"valor_fcp\": 0.0,\n      \"valor_em_aberto\": 0.0,\n      \"notas_em_aberto\": 0,\n      \"valor_a_conferir\": 0.0,\n      \"notas_a_conferir\": 0,\n      \"notas\": [],\n      \"guias\": []\n    }\n  ],\n  \"avisos\": [\n    \"O Portal da DIFAL atende 10 UFs de destino: AC, AP, DF, GO, MS, MT, RR, RS, SC e SE. As demais UFs tem sistema proprio e nao sao consultadas por esta fonte.\",\n    \"Nota 'sem_guia_no_portal' significa que nenhuma guia foi gerada no proprio portal. Guia emitida pelo ERP ou pelo Portal GNRE, e o recolhimento mensal de quem tem inscricao estadual na UF de destino, nao aparecem aqui: confira antes de tratar como debito.\",\n    \"'a_conferir' marca nota cuja guia existe mas o pagamento nao foi confirmado pelo portal (aguardando processamento, substituida ou nao localizada). Ela nao entra no valor em aberto.\",\n    \"A situacao de cada guia (paga, pendente, rejeitada) e a informada pelo portal.\"\n  ],\n  \"creditos_cobrados\": 2\n}"
+            },
+            {
+              "name": "200 - Uma UF não consultada (completo false)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/consultar-difal-saida",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "consultar-difal-saida"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"certificado\": \"MIIKcQIBAzCCCjcGCSqGSIb3DQEHAaCCCigEggokMIIK...\",\n  \"senha\": \"senha-do-certificado\",\n  \"competencia\": \"2026-10\",\n  \"ufs\": [\n    \"RS\",\n    \"SC\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"fonte\": \"Portal da DIFAL (SVRS) - Modulo de Apuracao\",\n  \"emitente_tipo\": \"CNPJ\",\n  \"emitente_documento\": \"12345678000195\",\n  \"competencia\": \"2026-10\",\n  \"periodo_inicio\": \"2026-10-01\",\n  \"periodo_fim\": \"2026-10-31\",\n  \"total_documentos\": 3,\n  \"valor_difal\": 650.05,\n  \"valor_fcp\": 80.0,\n  \"valor_em_aberto\": 370.05,\n  \"notas_em_aberto\": 2,\n  \"valor_a_conferir\": 0.0,\n  \"notas_a_conferir\": 0,\n  \"completo\": false,\n  \"ufs\": [\n    {\n      \"uf\": \"RS\",\n      \"status\": \"ok\",\n      \"mensagem\": \"\",\n      \"total_documentos\": 3,\n      \"valor_difal\": 650.05,\n      \"valor_fcp\": 80.0,\n      \"valor_em_aberto\": 370.05,\n      \"notas_em_aberto\": 2,\n      \"valor_a_conferir\": 0.0,\n      \"notas_a_conferir\": 0,\n      \"notas\": [\n        {\n          \"serie\": \"1\",\n          \"numero\": \"1001\",\n          \"data_emissao\": \"2026-10-03\",\n          \"vencimento\": \"2026-10-03\",\n          \"destinatario\": \"MARIA DA SILVA\",\n          \"uf_destino\": \"RS\",\n          \"valor_total\": 1000.0,\n          \"valor_difal\": 100.0,\n          \"valor_fcp\": 20.0,\n          \"situacao_guia_difal\": \"sem_guia_no_portal\",\n          \"situacao_guia_fcp\": \"sem_guia_no_portal\",\n          \"em_aberto\": true,\n          \"valor_em_aberto\": 120.0,\n          \"a_conferir\": false,\n          \"valor_a_conferir\": 0.0\n        },\n        {\n          \"serie\": \"1\",\n          \"numero\": \"1002\",\n          \"data_emissao\": \"2026-10-05\",\n          \"vencimento\": \"2026-10-05\",\n          \"destinatario\": \"JOAO PEREIRA\",\n          \"uf_destino\": \"RS\",\n          \"valor_total\": 2500.0,\n          \"valor_difal\": 250.05,\n          \"valor_fcp\": 0.0,\n          \"situacao_guia_difal\": \"pendente_pagamento\",\n          \"situacao_guia_fcp\": \"nao_se_aplica\",\n          \"em_aberto\": true,\n          \"valor_em_aberto\": 250.05,\n          \"a_conferir\": false,\n          \"valor_a_conferir\": 0.0\n        },\n        {\n          \"serie\": \"1\",\n          \"numero\": \"1003\",\n          \"data_emissao\": \"2026-10-08\",\n          \"vencimento\": \"2026-10-08\",\n          \"destinatario\": \"ANA SOUZA\",\n          \"uf_destino\": \"RS\",\n          \"valor_total\": 3000.0,\n          \"valor_difal\": 300.0,\n          \"valor_fcp\": 60.0,\n          \"situacao_guia_difal\": \"paga\",\n          \"situacao_guia_fcp\": \"paga\",\n          \"em_aberto\": false,\n          \"valor_em_aberto\": 0.0,\n          \"a_conferir\": false,\n          \"valor_a_conferir\": 0.0\n        }\n      ],\n      \"guias\": [\n        {\n          \"numero\": \"2026100000001\",\n          \"vencimento_imposto\": \"2026-10-05\",\n          \"data_limite_pagamento\": \"2026-10-05\",\n          \"uf\": \"RS\",\n          \"tributo\": \"ICMS DIFAL\",\n          \"valor\": 250.05,\n          \"situacao\": \"pendente_pagamento\"\n        },\n        {\n          \"numero\": \"2026100000002\",\n          \"vencimento_imposto\": \"2026-10-08\",\n          \"data_limite_pagamento\": \"2026-10-08\",\n          \"uf\": \"RS\",\n          \"tributo\": \"ICMS DIFAL\",\n          \"valor\": 300.0,\n          \"situacao\": \"paga\"\n        },\n        {\n          \"numero\": \"2026100000003\",\n          \"vencimento_imposto\": \"2026-10-08\",\n          \"data_limite_pagamento\": \"2026-10-08\",\n          \"uf\": \"RS\",\n          \"tributo\": \"FCP\",\n          \"valor\": 60.0,\n          \"situacao\": \"paga\"\n        }\n      ]\n    },\n    {\n      \"uf\": \"SC\",\n      \"status\": \"nao_consultada\",\n      \"mensagem\": \"Tempo da consulta esgotado antes desta UF. Consulte-a de novo.\",\n      \"total_documentos\": 0,\n      \"valor_difal\": 0.0,\n      \"valor_fcp\": 0.0,\n      \"valor_em_aberto\": 0.0,\n      \"notas_em_aberto\": 0,\n      \"valor_a_conferir\": 0.0,\n      \"notas_a_conferir\": 0,\n      \"notas\": [],\n      \"guias\": []\n    }\n  ],\n  \"avisos\": [\n    \"O Portal da DIFAL atende 10 UFs de destino: AC, AP, DF, GO, MS, MT, RR, RS, SC e SE. As demais UFs tem sistema proprio e nao sao consultadas por esta fonte.\",\n    \"Nota 'sem_guia_no_portal' significa que nenhuma guia foi gerada no proprio portal. Guia emitida pelo ERP ou pelo Portal GNRE, e o recolhimento mensal de quem tem inscricao estadual na UF de destino, nao aparecem aqui: confira antes de tratar como debito.\",\n    \"'a_conferir' marca nota cuja guia existe mas o pagamento nao foi confirmado pelo portal (aguardando processamento, substituida ou nao localizada). Ela nao entra no valor em aberto.\",\n    \"A situacao de cada guia (paga, pendente, rejeitada) e a informada pelo portal.\"\n  ],\n  \"creditos_cobrados\": 1\n}"
+            },
+            {
+              "name": "400 - UF_NAO_ATENDIDA",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/consultar-difal-saida",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "consultar-difal-saida"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"certificado\": \"MIIKcQIBAzCCCjcGCSqGSIb3DQEHAaCCCigEggokMIIK...\",\n  \"senha\": \"senha-do-certificado\",\n  \"competencia\": \"2026-10\",\n  \"ufs\": [\n    \"SP\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/problem+json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"type\": \"urn:fiscalapi:error:uf_nao_atendida\",\n  \"title\": \"UF_NAO_ATENDIDA\",\n  \"status\": 400,\n  \"detail\": \"UF fora do Portal da DIFAL: SP. Atendidas: AC, AP, DF, GO, MS, MT, RR, RS, SC, SE.\",\n  \"instance\": \"https://api.fiscalapi.com.br/api/consultar-difal-saida\",\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"timestamp\": \"2026-11-16T13:00:00+00:00\"\n}"
+            },
+            {
+              "name": "400 - COMPETENCIA_INVALIDA (mês futuro)",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/consultar-difal-saida",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "consultar-difal-saida"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"certificado\": \"MIIKcQIBAzCCCjcGCSqGSIb3DQEHAaCCCigEggokMIIK...\",\n  \"senha\": \"senha-do-certificado\",\n  \"competencia\": \"2027-01\",\n  \"ufs\": [\n    \"RS\",\n    \"SC\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/problem+json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"type\": \"urn:fiscalapi:error:competencia_invalida\",\n  \"title\": \"COMPETENCIA_INVALIDA\",\n  \"status\": 400,\n  \"detail\": \"A competencia nao pode ser um mes futuro.\",\n  \"instance\": \"https://api.fiscalapi.com.br/api/consultar-difal-saida\",\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"timestamp\": \"2026-11-16T13:00:00+00:00\"\n}"
+            },
+            {
+              "name": "503 - FONTE_INDISPONIVEL",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/consultar-difal-saida",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "consultar-difal-saida"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"certificado\": \"MIIKcQIBAzCCCjcGCSqGSIb3DQEHAaCCCigEggokMIIK...\",\n  \"senha\": \"senha-do-certificado\",\n  \"competencia\": \"2026-10\",\n  \"ufs\": [\n    \"RS\",\n    \"SC\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Service Unavailable",
+              "code": 503,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/problem+json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"type\": \"urn:fiscalapi:error:fonte_indisponivel\",\n  \"title\": \"FONTE_INDISPONIVEL\",\n  \"status\": 503,\n  \"detail\": \"O Portal da DIFAL nao respondeu para nenhuma UF. Nada foi cobrado.\",\n  \"instance\": \"https://api.fiscalapi.com.br/api/consultar-difal-saida\",\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"timestamp\": \"2026-11-16T13:00:00+00:00\"\n}"
             }
           ]
         }
