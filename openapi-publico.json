@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "FiscalAPI",
-    "description": "API REST da FiscalAPI para consultar inscrição estadual (IE) nos 27 estados, CNPJ, certidões negativas estaduais e federais, XML de NF-e e de CT-e pela chave de acesso, DIFAL de saída por UF de destino, NFS-e do padrão nacional pela chave de acesso, imóveis rurais (CNIR e SIGEF), Simples Nacional, status da SEFAZ e o catálogo de rejeições da NF-e.\n\nAutenticação: envie a sua chave no cabeçalho `X-API-Key`. A chave é criada no painel (app.fiscalapi.com.br); sem ela, ou com chave inválida, a resposta é 403.\n\nCobrança: as consultas usam o saldo do plano. Sem plano ou saldo, a chamada devolve 402. Para testar antes de assinar, use as 10 consultas grátis do mês no painel. Limite por minuto conforme o plano; acima dele, 429 com o cabeçalho Retry-After.\n\nDocumentação completa: https://docs.fiscalapi.com.br",
+    "description": "API REST da FiscalAPI para consultar inscrição estadual (IE) nos 27 estados, CNPJ, certidões negativas estaduais e federais, XML de NF-e e de CT-e pela chave de acesso, NFS-e do padrão nacional pela chave de acesso, DIFAL de saída por UF de destino, imóveis rurais (CNIR e SIGEF), Simples Nacional, status da SEFAZ e o catálogo de rejeições da NF-e.\n\nAutenticação: envie a sua chave no cabeçalho `X-API-Key`. A chave é criada no painel (app.fiscalapi.com.br); sem ela, ou com chave inválida, a resposta é 403.\n\nCobrança: as consultas usam o saldo do plano. Sem plano ou saldo, a chamada devolve 402. Para testar antes de assinar, use as 10 consultas grátis do mês no painel. Limite por minuto conforme o plano; acima dele, 429 com o cabeçalho Retry-After.\n\nDocumentação completa: https://docs.fiscalapi.com.br",
     "version": "1.0.0"
   },
   "servers": [
@@ -1876,14 +1876,14 @@
         "description": "Lista, para o mês informado, as NF-e do emitente com DIFAL (EC 87/2015) e FCP destacados para cada UF de destino atendida pelo Portal da DIFAL (AC, AP, DF, GO, MS, MT, RR, RS, SC, SE), a situação da guia de cada nota (paga, pendente, rejeitada ou sem guia gerada no portal) e o valor em aberto. Usa o certificado digital do PRÓPRIO emitente (e-CNPJ ou e-CPF), enviado na requisição e NÃO armazenado. Cobra 1 consulta por UF com resposta completa; UF parcial, com falha da fonte ou não consultada por tempo não é cobrada.",
         "operationId": "consultar_difal_saida_endpoint_api_consultar_difal_saida_post",
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/DifalSaidaRequest"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
@@ -5946,7 +5946,7 @@
           "a_conferir": {
             "type": "boolean",
             "title": "A Conferir",
-            "description": "Guia existe mas a situacao nao foi confirmada pelo portal (aguardando processamento ou nao localizada). Nao entra no valor em aberto."
+            "description": "Guia existe mas a situação não foi confirmada pelo portal (aguardando processamento, substituída ou não localizada), ou nota sem guia no portal em DF, GO e MT, onde a guia é emitida no sistema da SEFAZ. Não entra no valor em aberto."
           },
           "valor_a_conferir": {
             "type": "number",
@@ -6202,13 +6202,13 @@
         "examples": [
           {
             "consultas_restantes": 1500,
-            "notas_restantes": 500,
             "creditos": {
-              "plano": 97.5,
+              "disponivel": 97.5,
               "extras": 0.0,
               "guardados": 0.0,
-              "disponivel": 97.5
-            }
+              "plano": 97.5
+            },
+            "notas_restantes": 500
           }
         ]
       },
@@ -7408,16 +7408,16 @@
       "description": "XML da NF-e pela chave de acesso, com o seu certificado digital ou sem certificado."
     },
     {
-      "name": "DIFAL",
-      "description": "DIFAL de saída por UF de destino (EC 87/2015): notas com DIFAL e FCP, situação da guia e valor em aberto, com o certificado digital do emitente."
-    },
-    {
       "name": "NFS-e",
       "description": "NFS-e do padrão nacional pela chave de acesso, sem certificado digital, com o PDF do DANFSe opcional."
     },
     {
       "name": "CT-e XML",
       "description": "XML do CT-e, CT-e OS ou GTV-e pela chave de acesso, com o certificado digital de quem participa do documento."
+    },
+    {
+      "name": "DIFAL",
+      "description": "DIFAL de saída (EC 87/2015) por UF de destino: notas com DIFAL destacado, situação da guia e valor em aberto, com o certificado digital do emitente."
     },
     {
       "name": "Saldo",
