@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "FiscalAPI",
-    "description": "API REST da FiscalAPI para consultar inscrição estadual (IE) nos 27 estados, CNPJ, certidões negativas estaduais e federais, XML de NF-e e de CT-e pela chave de acesso, NFS-e do padrão nacional pela chave de acesso, imóveis rurais (CNIR e SIGEF), Simples Nacional, status da SEFAZ e o catálogo de rejeições da NF-e.\n\nAutenticação: envie a sua chave no cabeçalho `X-API-Key`. A chave é criada no painel (app.fiscalapi.com.br); sem ela, ou com chave inválida, a resposta é 403.\n\nCobrança: as consultas usam o saldo do plano. Sem plano ou saldo, a chamada devolve 402. Para testar antes de assinar, use as 10 consultas grátis do mês no painel. Limite por minuto conforme o plano; acima dele, 429 com o cabeçalho Retry-After.\n\nDocumentação completa: https://docs.fiscalapi.com.br",
+    "description": "API REST da FiscalAPI para consultar inscrição estadual (IE) nos 27 estados, CNPJ, certidões negativas estaduais e federais, XML de NF-e e de CT-e pela chave de acesso, NFS-e do padrão nacional pela chave de acesso, DIFAL de saída por UF de destino, imóveis rurais (CNIR e SIGEF), Simples Nacional, status da SEFAZ e o catálogo de rejeições da NF-e.\n\nAutenticação: envie a sua chave no cabeçalho `X-API-Key`. A chave é criada no painel (app.fiscalapi.com.br); sem ela, ou com chave inválida, a resposta é 403.\n\nCobrança: as consultas usam o saldo do plano. Sem plano ou saldo, a chamada devolve 402. Para testar antes de assinar, use as 10 consultas grátis do mês no painel. Limite por minuto conforme o plano; acima dele, 429 com o cabeçalho Retry-After.\n\nDocumentação completa: https://docs.fiscalapi.com.br",
     "version": "1.0.0"
   },
   "servers": [
@@ -1807,6 +1807,91 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/NfeXmlResponse"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou compre créditos extras.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Chave ausente, inválida ou revogada.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de requisições por minuto excedido. Veja o cabeçalho Retry-After.",
+            "headers": {
+              "Retry-After": {
+                "description": "Segundos até poder tentar de novo.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroLimite"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/consultar-difal-saida": {
+      "post": {
+        "tags": [
+          "DIFAL"
+        ],
+        "summary": "DIFAL de saída por UF de destino, com certificado do emitente",
+        "description": "Lista, para o mês informado, as NF-e do emitente com DIFAL (EC 87/2015) e FCP destacados para cada UF de destino atendida pelo Portal da DIFAL (AC, AP, DF, GO, MS, MT, RR, RS, SC, SE), a situação da guia de cada nota (paga, pendente, rejeitada ou sem guia gerada no portal) e o valor em aberto. Usa o certificado digital do PRÓPRIO emitente (e-CNPJ ou e-CPF), enviado na requisição e NÃO armazenado. Cobra 1 consulta por UF com resposta completa; UF parcial, com falha da fonte ou não consultada por tempo não é cobrada.",
+        "operationId": "consultar_difal_saida_endpoint_api_consultar_difal_saida_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DifalSaidaRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DifalSaidaResponse"
                 }
               }
             }
@@ -4225,6 +4310,163 @@
         ],
         "title": "CteXmlResponse"
       },
+      "DifalSaidaRequest": {
+        "properties": {
+          "certificado": {
+            "type": "string",
+            "title": "Certificado",
+            "description": "Binario do .pfx do EMITENTE das notas, em base64"
+          },
+          "senha": {
+            "type": "string",
+            "title": "Senha",
+            "description": "Senha do certificado"
+          },
+          "competencia": {
+            "type": "string",
+            "pattern": "^\\d{4}-(0[1-9]|1[0-2])$",
+            "title": "Competencia",
+            "description": "Mes de emissao das notas, no formato AAAA-MM",
+            "examples": [
+              "2026-10"
+            ]
+          },
+          "ufs": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ufs",
+            "description": "UFs de destino a consultar. Vazio = todas as atendidas pelo Portal da DIFAL (AC, AP, DF, GO, MS, MT, RR, RS, SC, SE).",
+            "examples": [
+              [
+                "RS",
+                "SC"
+              ]
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "certificado",
+          "senha",
+          "competencia"
+        ],
+        "title": "DifalSaidaRequest"
+      },
+      "DifalSaidaResponse": {
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "title": "Request Id"
+          },
+          "fonte": {
+            "type": "string",
+            "title": "Fonte"
+          },
+          "emitente_tipo": {
+            "type": "string",
+            "title": "Emitente Tipo",
+            "description": "CNPJ ou CPF do titular do certificado"
+          },
+          "emitente_documento": {
+            "type": "string",
+            "title": "Emitente Documento"
+          },
+          "competencia": {
+            "type": "string",
+            "title": "Competencia"
+          },
+          "periodo_inicio": {
+            "type": "string",
+            "title": "Periodo Inicio"
+          },
+          "periodo_fim": {
+            "type": "string",
+            "title": "Periodo Fim"
+          },
+          "total_documentos": {
+            "type": "integer",
+            "title": "Total Documentos"
+          },
+          "valor_difal": {
+            "type": "number",
+            "title": "Valor Difal"
+          },
+          "valor_fcp": {
+            "type": "number",
+            "title": "Valor Fcp"
+          },
+          "valor_em_aberto": {
+            "type": "number",
+            "title": "Valor Em Aberto"
+          },
+          "notas_em_aberto": {
+            "type": "integer",
+            "title": "Notas Em Aberto"
+          },
+          "valor_a_conferir": {
+            "type": "number",
+            "title": "Valor A Conferir"
+          },
+          "notas_a_conferir": {
+            "type": "integer",
+            "title": "Notas A Conferir"
+          },
+          "completo": {
+            "type": "boolean",
+            "title": "Completo",
+            "description": "True so quando TODAS as UFs pedidas voltaram 'ok'. False = totais podem estar incompletos."
+          },
+          "ufs": {
+            "items": {
+              "$ref": "#/components/schemas/UfDifalOut"
+            },
+            "type": "array",
+            "title": "Ufs"
+          },
+          "avisos": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Avisos"
+          },
+          "creditos_cobrados": {
+            "type": "integer",
+            "title": "Creditos Cobrados"
+          }
+        },
+        "type": "object",
+        "required": [
+          "request_id",
+          "fonte",
+          "emitente_tipo",
+          "emitente_documento",
+          "competencia",
+          "periodo_inicio",
+          "periodo_fim",
+          "total_documentos",
+          "valor_difal",
+          "valor_fcp",
+          "valor_em_aberto",
+          "notas_em_aberto",
+          "valor_a_conferir",
+          "notas_a_conferir",
+          "completo",
+          "ufs",
+          "avisos",
+          "creditos_cobrados"
+        ],
+        "title": "DifalSaidaResponse"
+      },
       "ErroLimite": {
         "type": "object",
         "required": [
@@ -4444,6 +4686,73 @@
             "request_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
           }
         ]
+      },
+      "GuiaGnreOut": {
+        "properties": {
+          "numero": {
+            "type": "string",
+            "title": "Numero"
+          },
+          "vencimento_imposto": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vencimento Imposto"
+          },
+          "data_limite_pagamento": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data Limite Pagamento"
+          },
+          "uf": {
+            "type": "string",
+            "title": "Uf"
+          },
+          "tributo": {
+            "type": "string",
+            "title": "Tributo"
+          },
+          "valor": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valor"
+          },
+          "situacao": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Situacao"
+          }
+        },
+        "type": "object",
+        "required": [
+          "numero",
+          "uf",
+          "tributo"
+        ],
+        "title": "GuiaGnreOut"
       },
       "HTTPValidationError": {
         "properties": {
@@ -5539,6 +5848,126 @@
         ],
         "title": "NfseTributoTotal"
       },
+      "NotaDifalOut": {
+        "properties": {
+          "serie": {
+            "type": "string",
+            "title": "Serie"
+          },
+          "numero": {
+            "type": "string",
+            "title": "Numero"
+          },
+          "data_emissao": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data Emissao",
+            "description": "AAAA-MM-DD"
+          },
+          "vencimento": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vencimento",
+            "description": "Vencimento do imposto, AAAA-MM-DD"
+          },
+          "destinatario": {
+            "type": "string",
+            "title": "Destinatario"
+          },
+          "uf_destino": {
+            "type": "string",
+            "title": "Uf Destino"
+          },
+          "valor_total": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valor Total"
+          },
+          "valor_difal": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valor Difal",
+            "description": "ICMS interestadual da UF de destino destacado na nota"
+          },
+          "valor_fcp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valor Fcp",
+            "description": "Fundo de Combate a Pobreza destacado na nota"
+          },
+          "situacao_guia_difal": {
+            "type": "string",
+            "title": "Situacao Guia Difal",
+            "description": "sem_guia_no_portal | pendente_pagamento | paga | geracao_rejeitada | aguardando_processamento | substituida | guia_gerada | nao_se_aplica | desconhecida"
+          },
+          "situacao_guia_fcp": {
+            "type": "string",
+            "title": "Situacao Guia Fcp"
+          },
+          "em_aberto": {
+            "type": "boolean",
+            "title": "Em Aberto",
+            "description": "Imposto da nota sem guia no portal ou com guia pendente/rejeitada"
+          },
+          "valor_em_aberto": {
+            "type": "number",
+            "title": "Valor Em Aberto"
+          },
+          "a_conferir": {
+            "type": "boolean",
+            "title": "A Conferir",
+            "description": "Guia existe mas a situação não foi confirmada pelo portal (aguardando processamento, substituída ou não localizada), ou nota sem guia no portal em DF, GO e MT, onde a guia é emitida no sistema da SEFAZ. Não entra no valor em aberto."
+          },
+          "valor_a_conferir": {
+            "type": "number",
+            "title": "Valor A Conferir"
+          }
+        },
+        "type": "object",
+        "required": [
+          "serie",
+          "numero",
+          "destinatario",
+          "uf_destino",
+          "situacao_guia_difal",
+          "situacao_guia_fcp",
+          "em_aberto",
+          "valor_em_aberto",
+          "a_conferir",
+          "valor_a_conferir"
+        ],
+        "title": "NotaDifalOut"
+      },
       "RegimeTributarioAno": {
         "properties": {
           "ano": {
@@ -5773,13 +6202,13 @@
         "examples": [
           {
             "consultas_restantes": 1500,
-            "notas_restantes": 500,
             "creditos": {
-              "plano": 97.5,
+              "disponivel": 97.5,
               "extras": 0.0,
               "guardados": 0.0,
-              "disponivel": 97.5
-            }
+              "plano": 97.5
+            },
+            "notas_restantes": 500
           }
         ]
       },
@@ -6815,6 +7244,81 @@
           }
         ]
       },
+      "UfDifalOut": {
+        "properties": {
+          "uf": {
+            "type": "string",
+            "title": "Uf"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "description": "ok (completa, cobrada) | parcial (dados incompletos, nao cobrada) | erro (falha da fonte, nao cobrada) | nao_consultada (tempo esgotado, nao cobrada)"
+          },
+          "mensagem": {
+            "type": "string",
+            "title": "Mensagem",
+            "default": ""
+          },
+          "total_documentos": {
+            "type": "integer",
+            "title": "Total Documentos",
+            "default": 0
+          },
+          "valor_difal": {
+            "type": "number",
+            "title": "Valor Difal",
+            "default": 0.0
+          },
+          "valor_fcp": {
+            "type": "number",
+            "title": "Valor Fcp",
+            "default": 0.0
+          },
+          "valor_em_aberto": {
+            "type": "number",
+            "title": "Valor Em Aberto",
+            "default": 0.0
+          },
+          "notas_em_aberto": {
+            "type": "integer",
+            "title": "Notas Em Aberto",
+            "default": 0
+          },
+          "valor_a_conferir": {
+            "type": "number",
+            "title": "Valor A Conferir",
+            "default": 0.0
+          },
+          "notas_a_conferir": {
+            "type": "integer",
+            "title": "Notas A Conferir",
+            "default": 0
+          },
+          "notas": {
+            "items": {
+              "$ref": "#/components/schemas/NotaDifalOut"
+            },
+            "type": "array",
+            "title": "Notas",
+            "default": []
+          },
+          "guias": {
+            "items": {
+              "$ref": "#/components/schemas/GuiaGnreOut"
+            },
+            "type": "array",
+            "title": "Guias",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "uf",
+          "status"
+        ],
+        "title": "UfDifalOut"
+      },
       "ValidationError": {
         "properties": {
           "loc": {
@@ -6910,6 +7414,10 @@
     {
       "name": "CT-e XML",
       "description": "XML do CT-e, CT-e OS ou GTV-e pela chave de acesso, com o certificado digital de quem participa do documento."
+    },
+    {
+      "name": "DIFAL",
+      "description": "DIFAL de saída (EC 87/2015) por UF de destino: notas com DIFAL destacado, situação da guia e valor em aberto, com o certificado digital do emitente."
     },
     {
       "name": "Saldo",
