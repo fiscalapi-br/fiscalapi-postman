@@ -925,7 +925,7 @@
           "Certidoes Federais"
         ],
         "summary": "Consultar CND Federal (RF+PGFN)",
-        "description": "Consulta Certidao Negativa de Debitos relativos a Tributos Federais e a Divida Ativa da Uniao (Receita Federal + PGFN). Se o contribuinte ja tem certidao que vale por mais de 3 dias, devolve essa (`modo=consulta`); se nao tem, emite uma nova (`modo=emissao`). Com `emitir_nova=true`, emite sempre.",
+        "description": "Consulta Certidao Negativa de Debitos relativos a Tributos Federais e a Divida Ativa da Uniao (Receita Federal + PGFN). Se o contribuinte ja tem certidao que vale por mais de 3 dias, devolve essa (`modo=consulta`); se nao tem, emite uma nova (`modo=emissao`). Com `emitir_nova=true`, emite sempre. Para CPF, informe tambem `data_nascimento`: a Receita nao emite sem ela.",
         "operationId": "consultar_cnd_federal_api_consultar_cnd_federal_get",
         "parameters": [
           {
@@ -961,6 +961,18 @@
               "title": "Emitir Nova"
             },
             "description": "Emite uma certidao nova mesmo que o contribuinte ja tenha uma valida."
+          },
+          {
+            "name": "data_nascimento",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Data de nascimento do titular do CPF (DD/MM/AAAA ou AAAA-MM-DD). Obrigatoria para CPF.",
+              "default": "",
+              "title": "Data Nascimento"
+            },
+            "description": "Data de nascimento do titular do CPF (DD/MM/AAAA ou AAAA-MM-DD). Obrigatoria para CPF."
           }
         ],
         "responses": {
@@ -2200,7 +2212,7 @@
           "CT-e XML"
         ],
         "summary": "Consultar XML de CT-e por chave, com certificado",
-        "description": "Retorna o XML completo de UM CT-e, CT-e OS ou GTV-e a partir da chave de acesso (44 posicoes; aceita CNPJ alfanumerico do emitente), usando o certificado digital do cliente (e-CPF/e-CNPJ) enviado na requisicao. O certificado NAO e armazenado. So retorna o documento quando o titular do certificado e participante. Cobra so quando retorna XML, no mesmo valor do XML de NF-e com certificado. Chave sem XML nao e cobrada.",
+        "description": "Retorna o XML completo de UM CT-e, CT-e OS ou GTV-e a partir da chave de acesso (44 posicoes; aceita CNPJ alfanumerico do emitente), usando o certificado digital do cliente (e-CPF/e-CNPJ) enviado na requisicao. O certificado NAO e armazenado. So retorna o documento quando o titular do certificado e participante. Cobra so quando retorna XML, de R$ 0,05 (Enterprise) a R$ 0,30 (Starter) por CT-e. Chave sem XML nao e cobrada.",
         "operationId": "consultar_cte_xml_endpoint_api_consultar_cte_xml_post",
         "requestBody": {
           "required": true,

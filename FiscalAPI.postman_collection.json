@@ -978,10 +978,22 @@
                 {
                   "key": "cnpj",
                   "value": "12345678000195"
+                },
+                {
+                  "key": "cpf",
+                  "value": "12345678909",
+                  "description": "CPF do titular (no lugar de `cnpj`). Exige `data_nascimento`.",
+                  "disabled": true
+                },
+                {
+                  "key": "data_nascimento",
+                  "value": "12/04/1985",
+                  "description": "Data de nascimento do titular do CPF (DD/MM/AAAA ou AAAA-MM-DD). Obrigatória para CPF.",
+                  "disabled": true
                 }
               ]
             },
-            "description": "Certidão de débitos relativos a tributos federais e à Dívida Ativa da União.\n\n- Já existe certidão válida por mais de 3 dias: devolve essa certidão (`modo: consulta`).\n- Não existe, ou vence em até 3 dias: emite uma nova (`modo: emissao`).\n- `emitir_nova=true`: emite sempre uma nova.\n\nPor enquanto, somente **CNPJ** (consultas por CPF voltam `status: erro`, sem cobrança).\n\nA emissão pode levar até cerca de 60 s. Se não ficar pronta, a resposta é HTTP 200 com `source_status.error_code = EM_PROCESSAMENTO` e o header `Retry-After`: consulte de novo depois do tempo indicado (não dispara outra emissão e não é cobrado).\n\n**Cobrança:** 1 crédito por consulta com dado. Erros (HTTP 4xx/5xx ou `source_status.status` diferente de `success`) não são cobrados. Respostas de cache (`cached: true`) cobram normalmente.\n\nDocumentação: https://docs.fiscalapi.com.br/docs/certidoes-federais/consultar-cnd-federal"
+            "description": "Certidão de débitos relativos a tributos federais e à Dívida Ativa da União.\n\n- Já existe certidão válida por mais de 3 dias: devolve essa certidão (`modo: consulta`).\n- Não existe, ou vence em até 3 dias: emite uma nova (`modo: emissao`).\n- `emitir_nova=true`: emite sempre uma nova.\n\nAceita **CNPJ** ou **CPF**. Para CPF, envie também `data_nascimento` (DD/MM/AAAA ou AAAA-MM-DD): a Receita não emite sem ela. CPF sem a data, ou com data que não confere com a Receita, volta `status: erro`, sem cobrança. Para testar por CPF, desmarque `cnpj` e marque `cpf` e `data_nascimento`.\n\nA emissão pode levar até cerca de 60 s. Se não ficar pronta, a resposta é HTTP 200 com `source_status.error_code = EM_PROCESSAMENTO` e o header `Retry-After`: consulte de novo depois do tempo indicado (não dispara outra emissão e não é cobrado).\n\n**Cobrança:** 1 crédito por consulta com dado. Erros (HTTP 4xx/5xx ou `source_status.status` diferente de `success`) não são cobrados. Respostas de cache (`cached: true`) cobram normalmente.\n\nDocumentação: https://docs.fiscalapi.com.br/docs/certidoes-federais/consultar-cnd-federal"
           },
           "response": [
             {
