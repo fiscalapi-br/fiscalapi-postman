@@ -2639,6 +2639,822 @@
           }
         }
       }
+    },
+    "/api/monitor-nfe/chaves": {
+      "post": {
+        "tags": [
+          "Monitor de NF-e"
+        ],
+        "summary": "Monitorar chaves de NF-e",
+        "description": "Coloca até 1.000 chaves de NF-e (modelo 55) no monitor. A FiscalAPI verifica a situação de cada nota ao longo do prazo e avisa no seu webhook quando ela muda (cancelamento, denegação) ou quando a nota recebe um evento (carta de correção). Cada chave aceita é cobrada uma vez; chave já monitorada pela conta não é cobrada de novo. Sem saldo para todas as aceitas, a resposta é 402 e nenhuma chave entra. Chaves inválidas voltam com o motivo e não são cobradas.",
+        "operationId": "cadastrar_chaves_api_monitor_nfe_chaves_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CadastroRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CadastroResponse"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou compre créditos extras.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Chave ausente, inválida ou revogada.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de requisições por minuto excedido. Veja o cabeçalho Retry-After.",
+            "headers": {
+              "Retry-After": {
+                "description": "Segundos até poder tentar de novo.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroLimite"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Monitor de NF-e"
+        ],
+        "summary": "Listar chaves monitoradas",
+        "description": "Lista os monitoramentos da conta, do menos ao mais recentemente alterado, com paginação por cursor. Use `alterado_desde` para buscar o que mudou desde a última leitura (por exemplo, se algum aviso do webhook se perdeu): a busca volta 5 minutos antes do instante pedido, então itens já vistos podem repetir; deduplique por `chave` + `atualizada_em`. `entregas_falhas` conta os avisos que o webhook não recebeu. Não é cobrado.",
+        "operationId": "listar_chaves_api_monitor_nfe_chaves_get",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "autorizada",
+                    "autorizada_fora_prazo",
+                    "denegada",
+                    "cancelada",
+                    "cancelada_fora_prazo",
+                    "nao_encontrada",
+                    "chave_divergente"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Só notas nesta situação.",
+              "title": "Status"
+            },
+            "description": "Só notas nesta situação."
+          },
+          {
+            "name": "ativo",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "true: só monitoramentos correndo; false: só os encerrados.",
+              "title": "Ativo"
+            },
+            "description": "true: só monitoramentos correndo; false: só os encerrados."
+          },
+          {
+            "name": "alterado_desde",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Só monitoramentos alterados a partir deste instante, com 5 minutos de folga para trás (itens podem repetir: deduplique por chave + atualizada_em). Sem fuso: horário de Brasília.",
+              "title": "Alterado Desde"
+            },
+            "description": "Só monitoramentos alterados a partir deste instante, com 5 minutos de folga para trás (itens podem repetir: deduplique por chave + atualizada_em). Sem fuso: horário de Brasília."
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 200
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "`proximo_cursor` da página anterior.",
+              "title": "Cursor"
+            },
+            "description": "`proximo_cursor` da página anterior."
+          },
+          {
+            "name": "limite",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 1000,
+              "minimum": 1,
+              "description": "Itens por página (1 a 1.000).",
+              "default": 100,
+              "title": "Limite"
+            },
+            "description": "Itens por página (1 a 1.000)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListaDeChaves"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Chave ausente, inválida ou revogada.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de requisições por minuto excedido. Veja o cabeçalho Retry-After.",
+            "headers": {
+              "Retry-After": {
+                "description": "Segundos até poder tentar de novo.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroLimite"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/monitor-nfe/chaves/remover": {
+      "post": {
+        "tags": [
+          "Monitor de NF-e"
+        ],
+        "summary": "Parar de monitorar chaves",
+        "description": "Encerra o monitoramento de até 1.000 chaves da conta. Não há estorno e não sai aviso no webhook. Não é cobrado.",
+        "operationId": "remover_chaves_api_monitor_nfe_chaves_remover_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoverRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RemoverResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Chave ausente, inválida ou revogada.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de requisições por minuto excedido. Veja o cabeçalho Retry-After.",
+            "headers": {
+              "Retry-After": {
+                "description": "Segundos até poder tentar de novo.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroLimite"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/monitor-nfe/chaves/{chave}": {
+      "delete": {
+        "tags": [
+          "Monitor de NF-e"
+        ],
+        "summary": "Parar de monitorar uma chave",
+        "description": "Encerra o monitoramento da chave. Não há estorno e não sai aviso no webhook. Não é cobrado.",
+        "operationId": "remover_chave_api_monitor_nfe_chaves__chave__delete",
+        "parameters": [
+          {
+            "name": "chave",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 80,
+              "description": "Chave de acesso da NF-e.",
+              "title": "Chave"
+            },
+            "description": "Chave de acesso da NF-e."
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "403": {
+            "description": "Chave ausente, inválida ou revogada.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "A chave não está sendo monitorada pela conta."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de requisições por minuto excedido. Veja o cabeçalho Retry-After.",
+            "headers": {
+              "Retry-After": {
+                "description": "Segundos até poder tentar de novo.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroLimite"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Monitor de NF-e"
+        ],
+        "summary": "Consultar uma chave monitorada",
+        "description": "Situação atual, eventos registrados, próxima verificação, fim do monitoramento da chave (o mais recente da conta) e os avisos que o webhook não recebeu. Não é cobrado.",
+        "operationId": "consultar_chave_api_monitor_nfe_chaves__chave__get",
+        "parameters": [
+          {
+            "name": "chave",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 80,
+              "description": "Chave de acesso da NF-e.",
+              "title": "Chave"
+            },
+            "description": "Chave de acesso da NF-e."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChaveMonitoradaDetalhe"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Chave ausente, inválida ou revogada.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "A chave não está no monitor da conta."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de requisições por minuto excedido. Veja o cabeçalho Retry-After.",
+            "headers": {
+              "Retry-After": {
+                "description": "Segundos até poder tentar de novo.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroLimite"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/monitor-nfe/webhook": {
+      "put": {
+        "tags": [
+          "Monitor de NF-e"
+        ],
+        "summary": "Cadastrar o webhook",
+        "description": "Cadastra (ou troca) a URL que recebe os avisos por POST, uma por conta. Aceita só https na porta 443, com nome público. Devolve o segredo da assinatura UMA única vez: cada aviso leva `X-FiscalAPI-Timestamp` e `X-FiscalAPI-Assinatura` (`v1=` + HMAC-SHA256 do segredo sobre `timestamp.corpo`). Cadastrar de novo gera outro segredo e reativa o webhook. Até 10 por hora. Não é cobrado.",
+        "operationId": "cadastrar_webhook_api_monitor_nfe_webhook_put",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebhookRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookCriado"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Chave ausente, inválida ou revogada.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de requisições por minuto excedido. Veja o cabeçalho Retry-After.",
+            "headers": {
+              "Retry-After": {
+                "description": "Segundos até poder tentar de novo.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroLimite"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Monitor de NF-e"
+        ],
+        "summary": "Consultar o webhook",
+        "description": "URL cadastrada e se os avisos estão saindo. O segredo não volta aqui. Não é cobrado.",
+        "operationId": "consultar_webhook_api_monitor_nfe_webhook_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookAtual"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Chave ausente, inválida ou revogada.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nenhum webhook cadastrado."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de requisições por minuto excedido. Veja o cabeçalho Retry-After.",
+            "headers": {
+              "Retry-After": {
+                "description": "Segundos até poder tentar de novo.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroLimite"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Monitor de NF-e"
+        ],
+        "summary": "Remover o webhook",
+        "description": "Remove o webhook. O monitoramento continua e a listagem segue mostrando as mudanças; só os avisos param. Não é cobrado.",
+        "operationId": "remover_webhook_api_monitor_nfe_webhook_delete",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "403": {
+            "description": "Chave ausente, inválida ou revogada.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nenhum webhook cadastrado."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de requisições por minuto excedido. Veja o cabeçalho Retry-After.",
+            "headers": {
+              "Retry-After": {
+                "description": "Segundos até poder tentar de novo.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroLimite"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/monitor-nfe/webhook/rotacionar-segredo": {
+      "post": {
+        "tags": [
+          "Monitor de NF-e"
+        ],
+        "summary": "Trocar o segredo do webhook",
+        "description": "Gera um segredo novo, mostrado UMA única vez. Por 24 horas os avisos levam as duas assinaturas no cabeçalho (`v1=nova,v1=anterior`), para você trocar sem perder aviso. Não é cobrado.",
+        "operationId": "rotacionar_segredo_api_monitor_nfe_webhook_rotacionar_segredo_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SegredoRotacionado"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Chave ausente, inválida ou revogada.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nenhum webhook cadastrado."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de requisições por minuto excedido. Veja o cabeçalho Retry-After.",
+            "headers": {
+              "Retry-After": {
+                "description": "Segundos até poder tentar de novo.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroLimite"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/monitor-nfe/webhook/teste": {
+      "post": {
+        "tags": [
+          "Monitor de NF-e"
+        ],
+        "summary": "Enviar um aviso de teste",
+        "description": "Enfileira um aviso `tipo=teste` para o webhook cadastrado, assinado como os demais. O corpo traz só `id`, `tipo` e `ocorrido_em`. Até 10 por hora. Não é cobrado.",
+        "operationId": "testar_webhook_api_monitor_nfe_webhook_teste_post",
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TesteEnfileirado"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Chave ausente, inválida ou revogada.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Nenhum webhook cadastrado."
+          },
+          "409": {
+            "description": "Webhook desativado por falhas seguidas: cadastre de novo."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de requisições por minuto excedido. Veja o cabeçalho Retry-After.",
+            "headers": {
+              "Retry-After": {
+                "description": "Segundos até poder tentar de novo.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroLimite"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -3335,6 +4151,79 @@
           }
         ]
       },
+      "CadastroRequest": {
+        "properties": {
+          "chaves": {
+            "items": {
+              "$ref": "#/components/schemas/ChaveParaMonitorar"
+            },
+            "type": "array",
+            "maxItems": 1000,
+            "minItems": 1,
+            "title": "Chaves",
+            "description": "De 1 a 1.000 chaves por chamada."
+          },
+          "prazo_dias": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 180.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prazo Dias",
+            "description": "Dias de monitoramento, de 1 a 180 (padrão: 180). O monitoramento também termina quando a nota é cancelada ou denegada."
+          }
+        },
+        "type": "object",
+        "required": [
+          "chaves"
+        ],
+        "title": "CadastroRequest",
+        "examples": [
+          {
+            "chaves": [
+              {
+                "chave": "35261111222333000181550010000001231123456787",
+                "status_conhecido": "autorizada"
+              }
+            ],
+            "prazo_dias": 180
+          }
+        ]
+      },
+      "CadastroResponse": {
+        "properties": {
+          "resultados": {
+            "items": {
+              "$ref": "#/components/schemas/ResultadoDaChave"
+            },
+            "type": "array",
+            "title": "Resultados",
+            "description": "Um resultado por chave enviada, na mesma ordem."
+          },
+          "aceitas": {
+            "type": "integer",
+            "title": "Aceitas",
+            "description": "Chaves que entraram no monitor e foram cobradas."
+          },
+          "valor_cobrado": {
+            "type": "string",
+            "title": "Valor Cobrado",
+            "description": "Valor cobrado nesta chamada, em reais (ex.: \"0,03\")."
+          }
+        },
+        "type": "object",
+        "required": [
+          "resultados",
+          "aceitas",
+          "valor_cobrado"
+        ],
+        "title": "CadastroResponse"
+      },
       "CertidaoFederalResponse": {
         "properties": {
           "request_id": {
@@ -3549,6 +4438,287 @@
             "request_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
           }
         ]
+      },
+      "ChaveMonitorada": {
+        "properties": {
+          "chave": {
+            "type": "string",
+            "title": "Chave"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "autorizada",
+                  "autorizada_fora_prazo",
+                  "denegada",
+                  "cancelada",
+                  "cancelada_fora_prazo",
+                  "nao_encontrada",
+                  "chave_divergente"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status",
+            "description": "Situação da NF-e: autorizada, autorizada_fora_prazo, denegada, cancelada, cancelada_fora_prazo, nao_encontrada ou chave_divergente. Nulo até a primeira verificação."
+          },
+          "ativo": {
+            "type": "boolean",
+            "title": "Ativo",
+            "description": "Se o monitoramento ainda está correndo."
+          },
+          "criada_em": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Criada Em",
+            "description": "Quando a chave entrou no monitor."
+          },
+          "encerra_em": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Encerra Em",
+            "description": "Fim previsto do monitoramento."
+          },
+          "encerrada_em": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Encerrada Em"
+          },
+          "motivo_encerramento": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motivo Encerramento",
+            "description": "Por que terminou: a situação final da nota (cancelada, denegada...), prazo, nao_encontrada, fora_do_prazo_sefaz ou removida."
+          },
+          "ultima_verificacao_em": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ultima Verificacao Em"
+          },
+          "proxima_verificacao_em": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Proxima Verificacao Em",
+            "description": "Próxima verificação prevista (nulo quando o monitoramento terminou)."
+          },
+          "atualizada_em": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Atualizada Em",
+            "description": "Última mudança deste monitoramento (aviso gerado ou encerramento)."
+          },
+          "entregas_falhas": {
+            "type": "integer",
+            "title": "Entregas Falhas",
+            "description": "Avisos deste monitoramento que o webhook não recebeu depois de todas as tentativas. Veja quais em GET /api/monitor-nfe/chaves/{chave}.",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "chave",
+          "ativo",
+          "criada_em",
+          "encerra_em",
+          "atualizada_em"
+        ],
+        "title": "ChaveMonitorada"
+      },
+      "ChaveMonitoradaDetalhe": {
+        "properties": {
+          "chave": {
+            "type": "string",
+            "title": "Chave"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "autorizada",
+                  "autorizada_fora_prazo",
+                  "denegada",
+                  "cancelada",
+                  "cancelada_fora_prazo",
+                  "nao_encontrada",
+                  "chave_divergente"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status",
+            "description": "Situação da NF-e: autorizada, autorizada_fora_prazo, denegada, cancelada, cancelada_fora_prazo, nao_encontrada ou chave_divergente. Nulo até a primeira verificação."
+          },
+          "ativo": {
+            "type": "boolean",
+            "title": "Ativo",
+            "description": "Se o monitoramento ainda está correndo."
+          },
+          "criada_em": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Criada Em",
+            "description": "Quando a chave entrou no monitor."
+          },
+          "encerra_em": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Encerra Em",
+            "description": "Fim previsto do monitoramento."
+          },
+          "encerrada_em": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Encerrada Em"
+          },
+          "motivo_encerramento": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motivo Encerramento",
+            "description": "Por que terminou: a situação final da nota (cancelada, denegada...), prazo, nao_encontrada, fora_do_prazo_sefaz ou removida."
+          },
+          "ultima_verificacao_em": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ultima Verificacao Em"
+          },
+          "proxima_verificacao_em": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Proxima Verificacao Em",
+            "description": "Próxima verificação prevista (nulo quando o monitoramento terminou)."
+          },
+          "atualizada_em": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Atualizada Em",
+            "description": "Última mudança deste monitoramento (aviso gerado ou encerramento)."
+          },
+          "entregas_falhas": {
+            "type": "integer",
+            "title": "Entregas Falhas",
+            "description": "Avisos deste monitoramento que o webhook não recebeu depois de todas as tentativas. Veja quais em GET /api/monitor-nfe/chaves/{chave}.",
+            "default": 0
+          },
+          "eventos": {
+            "items": {
+              "$ref": "#/components/schemas/EventoDaNota"
+            },
+            "type": "array",
+            "title": "Eventos",
+            "description": "Eventos registrados na nota, do mais antigo ao mais novo."
+          },
+          "entregas_que_falharam": {
+            "items": {
+              "$ref": "#/components/schemas/EntregaFalha"
+            },
+            "type": "array",
+            "title": "Entregas Que Falharam",
+            "description": "Avisos que o webhook não recebeu depois de todas as tentativas, do mais novo ao mais antigo (até 100)."
+          }
+        },
+        "type": "object",
+        "required": [
+          "chave",
+          "ativo",
+          "criada_em",
+          "encerra_em",
+          "atualizada_em",
+          "eventos",
+          "entregas_que_falharam"
+        ],
+        "title": "ChaveMonitoradaDetalhe"
+      },
+      "ChaveParaMonitorar": {
+        "properties": {
+          "chave": {
+            "type": "string",
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Chave",
+            "description": "Chave de acesso da NF-e (44 dígitos, modelo 55). Separadores são ignorados."
+          },
+          "status_conhecido": {
+            "type": "string",
+            "enum": [
+              "autorizada",
+              "autorizada_fora_prazo",
+              "denegada",
+              "cancelada",
+              "cancelada_fora_prazo",
+              "nao_encontrada",
+              "chave_divergente"
+            ],
+            "title": "Status Conhecido",
+            "description": "Situação que você já conhece. O primeiro aviso só sai se a situação atual for diferente desta.",
+            "default": "autorizada"
+          }
+        },
+        "type": "object",
+        "required": [
+          "chave"
+        ],
+        "title": "ChaveParaMonitorar"
       },
       "ChaveResultOut": {
         "properties": {
@@ -4479,6 +5649,51 @@
         ],
         "title": "DifalSaidaResponse"
       },
+      "EntregaFalha": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "Identificador do aviso (o `id` do corpo que seria enviado)."
+          },
+          "tipo": {
+            "type": "string",
+            "title": "Tipo",
+            "description": "Tipo do aviso (ex.: nfe.status_alterado)."
+          },
+          "criada_em": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Criada Em",
+            "description": "Quando o aviso foi gerado."
+          },
+          "tentativas": {
+            "type": "integer",
+            "title": "Tentativas",
+            "description": "Tentativas de envio feitas."
+          },
+          "ultimo_erro": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ultimo Erro",
+            "description": "Categoria do último erro (ex.: http_500, timeout, webhook_inativo)."
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "tipo",
+          "criada_em",
+          "tentativas"
+        ],
+        "title": "EntregaFalha"
+      },
       "ErroLimite": {
         "type": "object",
         "required": [
@@ -4698,6 +5913,71 @@
             "request_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
           }
         ]
+      },
+      "EventoDaNota": {
+        "properties": {
+          "tipo": {
+            "type": "string",
+            "enum": [
+              "cancelamento",
+              "carta_correcao",
+              "epec",
+              "outro"
+            ],
+            "title": "Tipo"
+          },
+          "codigo": {
+            "type": "string",
+            "title": "Codigo",
+            "description": "Código do evento (ex.: 110111 para cancelamento)."
+          },
+          "sequencia": {
+            "type": "integer",
+            "title": "Sequencia"
+          },
+          "protocolo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Protocolo"
+          },
+          "registrado_em": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Registrado Em"
+          },
+          "texto": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Texto",
+            "description": "Justificativa do cancelamento ou texto da correção."
+          }
+        },
+        "type": "object",
+        "required": [
+          "tipo",
+          "codigo",
+          "sequencia"
+        ],
+        "title": "EventoDaNota"
       },
       "GuiaGnreOut": {
         "properties": {
@@ -4955,6 +6235,34 @@
             "uf_ie": "MT"
           }
         ]
+      },
+      "ListaDeChaves": {
+        "properties": {
+          "itens": {
+            "items": {
+              "$ref": "#/components/schemas/ChaveMonitorada"
+            },
+            "type": "array",
+            "title": "Itens"
+          },
+          "proximo_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Proximo Cursor",
+            "description": "Passe em `cursor` para a próxima página. Nulo na última."
+          }
+        },
+        "type": "object",
+        "required": [
+          "itens"
+        ],
+        "title": "ListaDeChaves"
       },
       "NfeXmlRequest": {
         "properties": {
@@ -6148,6 +7456,50 @@
         ],
         "title": "RejeicaoListResponse"
       },
+      "RemoverRequest": {
+        "properties": {
+          "chaves": {
+            "items": {
+              "type": "string",
+              "maxLength": 80,
+              "minLength": 1
+            },
+            "type": "array",
+            "maxItems": 1000,
+            "minItems": 1,
+            "title": "Chaves",
+            "description": "De 1 a 1.000 chaves por chamada."
+          }
+        },
+        "type": "object",
+        "required": [
+          "chaves"
+        ],
+        "title": "RemoverRequest"
+      },
+      "RemoverResponse": {
+        "properties": {
+          "removidas": {
+            "type": "integer",
+            "title": "Removidas",
+            "description": "Chaves que deixaram de ser monitoradas. Não há estorno."
+          },
+          "nao_encontradas": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Nao Encontradas",
+            "description": "Chaves sem monitoramento ativo na conta (como vieram)."
+          }
+        },
+        "type": "object",
+        "required": [
+          "removidas",
+          "nao_encontradas"
+        ],
+        "title": "RemoverResponse"
+      },
       "RepresentanteLegal": {
         "properties": {
           "nome": {
@@ -6179,6 +7531,56 @@
         },
         "type": "object",
         "title": "RepresentanteLegal"
+      },
+      "ResultadoDaChave": {
+        "properties": {
+          "chave": {
+            "type": "string",
+            "title": "Chave",
+            "description": "Chave normalizada (ou como veio, se inválida)."
+          },
+          "situacao": {
+            "type": "string",
+            "enum": [
+              "aceita",
+              "ja_monitorada",
+              "invalida"
+            ],
+            "title": "Situacao",
+            "description": "aceita: monitoramento começou e foi cobrado; ja_monitorada: a chave já estava no monitor da conta (sem nova cobrança); invalida: veja `motivo`."
+          },
+          "motivo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motivo",
+            "description": "Por que a chave foi recusada: vazia, tamanho, caractere, dv, uf, data, modelo, tpemis, emitente, uf_nao_suportada ou fora_do_prazo_sefaz."
+          },
+          "encerra_em": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Encerra Em",
+            "description": "Fim previsto do monitoramento."
+          }
+        },
+        "type": "object",
+        "required": [
+          "chave",
+          "situacao"
+        ],
+        "title": "ResultadoDaChave"
       },
       "SaldoResponse": {
         "properties": {
@@ -6223,6 +7625,27 @@
             "notas_restantes": 500
           }
         ]
+      },
+      "SegredoRotacionado": {
+        "properties": {
+          "segredo": {
+            "type": "string",
+            "title": "Segredo",
+            "description": "Segredo novo. Mostrado só agora: guarde-o."
+          },
+          "anterior_valido_ate": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Anterior Valido Ate",
+            "description": "Até quando os avisos levam também a assinatura do segredo anterior."
+          }
+        },
+        "type": "object",
+        "required": [
+          "segredo",
+          "anterior_valido_ate"
+        ],
+        "title": "SegredoRotacionado"
       },
       "SigefConfrontante": {
         "properties": {
@@ -7154,6 +8577,26 @@
           }
         ]
       },
+      "TesteEnfileirado": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "Identificador do aviso de teste (o mesmo `id` do corpo enviado)."
+          },
+          "estado": {
+            "type": "string",
+            "const": "pendente",
+            "title": "Estado",
+            "default": "pendente"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "title": "TesteEnfileirado"
+      },
       "UFCNDResult": {
         "properties": {
           "uf": {
@@ -7370,6 +8813,74 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "WebhookAtual": {
+        "properties": {
+          "url": {
+            "type": "string",
+            "title": "Url"
+          },
+          "ativo": {
+            "type": "boolean",
+            "title": "Ativo",
+            "description": "Falso quando os avisos falharam por 3 dias seguidos. Cadastre de novo."
+          },
+          "falhando_desde": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Falhando Desde",
+            "description": "Início da sequência de falhas atual."
+          }
+        },
+        "type": "object",
+        "required": [
+          "url",
+          "ativo"
+        ],
+        "title": "WebhookAtual"
+      },
+      "WebhookCriado": {
+        "properties": {
+          "url": {
+            "type": "string",
+            "title": "Url",
+            "description": "URL cadastrada, normalizada."
+          },
+          "segredo": {
+            "type": "string",
+            "title": "Segredo",
+            "description": "Segredo da assinatura `X-FiscalAPI-Assinatura`. Mostrado só agora: guarde-o."
+          }
+        },
+        "type": "object",
+        "required": [
+          "url",
+          "segredo"
+        ],
+        "title": "WebhookCriado"
+      },
+      "WebhookRequest": {
+        "properties": {
+          "url": {
+            "type": "string",
+            "maxLength": 2048,
+            "minLength": 1,
+            "title": "Url",
+            "description": "URL https (porta 443) que recebe os avisos por POST."
+          }
+        },
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "title": "WebhookRequest"
       }
     },
     "securitySchemes": {
@@ -7442,6 +8953,10 @@
     {
       "name": "Rejeições SEFAZ",
       "description": "Catálogo de rejeições da NF-e com causas e solução."
+    },
+    {
+      "name": "Monitor de NF-e",
+      "description": "Acompanha a situação de NF-e pela chave de acesso e avisa no seu webhook quando a nota é cancelada, denegada ou recebe carta de correção."
     }
   ]
 }
