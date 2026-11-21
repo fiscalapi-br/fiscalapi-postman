@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "a502c70e-5ed7-54dd-9642-eda948b8f723",
     "name": "FiscalAPI",
-    "description": "API REST de consultas fiscais e cadastrais do Brasil, com foco no agronegócio: inscrição estadual nas 27 UFs, CNPJ, certidões estaduais e federais, XML de NF-e e de CT-e por chave, DIFAL de saída por UF de destino, imóveis rurais (SIGEF e CNIR) e perfil consolidado do produtor rural. Respostas em JSON.\n\n**Autenticação:** envie sua chave no header `X-API-Key` (formato `fapi_...`). Crie a conta e copie a chave em https://app.fiscalapi.com.br. Nunca exponha a chave no front-end.\n\n**Cobrança:** cada consulta com dado consome créditos do plano (1 na maioria; 3 no CNPJ ao vivo; NF-e conforme o plano). Erros não são cobrados. Erros da origem do dado vêm com HTTP 200 em `source_status` (também não cobrados).\n\n**Plano ou recarga:** pela API, toda consulta pede plano (a partir de R$ 50 por mês) ou saldo de recarga. As 10 consultas grátis do mês são só no painel (https://app.fiscalapi.com.br): teste lá antes de assinar. Sem plano nem saldo, o 402 é `LIMITE_ATINGIDO`.\n\n**Limites:** franquia mensal por conta e limite de requisições por minuto conforme o plano (Starter 20, Pro 60, Enterprise 120; conta sem plano, 5). Ao exceder: HTTP 402 `LIMITE_ATINGIDO` (saldo) ou HTTP 429 `RATE_LIMIT_EXCEEDED` (com `Retry-After`).\n\n**Erros:** formato RFC 7807 (`application/problem+json`) com `title` = código do erro e `request_id` para o suporte.\n\nDocumentação completa: https://docs.fiscalapi.com.br\n\n## Como usar\n1. Em **Variables** da coleção, cole sua chave em `apiKey` (fica só no seu Postman).\n2. Abra uma pasta, escolha a requisição e clique em **Send**.\n3. Veja respostas de exemplo em **Examples** de cada requisição.\n\nOs exemplos usam documentos fictícios (CNPJ 12.345.678/0001-95). Troque pelo documento que você quer consultar.",
+    "description": "API REST de consultas fiscais e cadastrais do Brasil, com foco no agronegócio: inscrição estadual nas 27 UFs, CNPJ, certidões estaduais e federais, XML de NF-e e de CT-e por chave, Monitor de NF-e por chave com aviso por webhook, DIFAL de saída por UF de destino, imóveis rurais (SIGEF e CNIR) e perfil consolidado do produtor rural. Respostas em JSON.\n\n**Autenticação:** envie sua chave no header `X-API-Key` (formato `fapi_...`). Crie a conta e copie a chave em https://app.fiscalapi.com.br. Nunca exponha a chave no front-end.\n\n**Cobrança:** cada consulta com dado consome créditos do plano (1 na maioria; 3 no CNPJ ao vivo; NF-e conforme o plano). Erros não são cobrados. Erros da origem do dado vêm com HTTP 200 em `source_status` (também não cobrados).\n\n**Plano ou recarga:** pela API, toda consulta pede plano (a partir de R$ 50 por mês) ou saldo de recarga. As 10 consultas grátis do mês são só no painel (https://app.fiscalapi.com.br): teste lá antes de assinar. Sem plano nem saldo, o 402 é `LIMITE_ATINGIDO`.\n\n**Limites:** franquia mensal por conta e limite de requisições por minuto conforme o plano (Starter 20, Pro 60, Enterprise 120; conta sem plano, 5). Ao exceder: HTTP 402 `LIMITE_ATINGIDO` (saldo) ou HTTP 429 `RATE_LIMIT_EXCEEDED` (com `Retry-After`).\n\n**Erros:** formato RFC 7807 (`application/problem+json`) com `title` = código do erro e `request_id` para o suporte.\n\nDocumentação completa: https://docs.fiscalapi.com.br\n\n## Como usar\n1. Em **Variables** da coleção, cole sua chave em `apiKey` (fica só no seu Postman).\n2. Abra uma pasta, escolha a requisição e clique em **Send**.\n3. Veja respostas de exemplo em **Examples** de cada requisição.\n\nOs exemplos usam documentos fictícios (CNPJ 12.345.678/0001-95). Troque pelo documento que você quer consultar.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -48,6 +48,12 @@
       "value": "",
       "type": "string",
       "description": "Chave de acesso do CT-e, CT-e OS ou GTV-e (44 dígitos)."
+    },
+    {
+      "key": "webhookUrl",
+      "value": "",
+      "type": "string",
+      "description": "URL https (porta 443) que recebe os avisos do Monitor de NF-e."
     },
     {
       "key": "certificadoBase64",
@@ -1803,6 +1809,1052 @@
                 }
               ],
               "body": "{\n  \"request_id\": \"req_exemplo\",\n  \"total\": 1,\n  \"com_dado\": 1,\n  \"creditos_cobrados\": 2,\n  \"resultados\": [\n    {\n      \"chave\": \"35261012345678000195550010000001231123456784\",\n      \"status\": \"ok\",\n      \"mensagem\": \"\",\n      \"xml\": \"(XML da nota, sem assinatura)\",\n      \"assinado\": false,\n      \"tipo_xml\": \"leitura\"\n    }\n  ]\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Monitor de NF-e",
+      "description": "Cadastre chaves de NF-e e a FiscalAPI acompanha cada nota na SEFAZ por até 180 dias. Quando a nota é cancelada, denegada ou recebe um evento, chega um aviso no seu webhook. Sem certificado.\n\n**Ordem:** 1) `Cadastrar o webhook` e guardar o `segredo`; 2) `Monitorar chaves de NF-e`; 3) `Enviar um aviso de teste` para conferir o seu receptor.\n\n## Aviso no webhook\n\nPOST JSON com os cabeçalhos `X-FiscalAPI-Evento-Id`, `X-FiscalAPI-Timestamp` (segundos Unix) e `X-FiscalAPI-Assinatura`. Tipos: `nfe.status_alterado` (o cancelamento vem aqui), `nfe.evento_registrado` (carta de correção, EPEC e outros), `nfe.monitoramento_encerrado` e `teste`.\n\n```json\n{\n  \"id\": \"evt_0123456789abcdef0123456789abcdef\",\n  \"tipo\": \"nfe.status_alterado\",\n  \"ocorrido_em\": \"2026-11-22T09:12:40-03:00\",\n  \"chave\": \"35261111222333000181550010000001231123456787\",\n  \"status_anterior\": \"autorizada\",\n  \"status_atual\": \"cancelada\",\n  \"evento\": {\n    \"tipo\": \"cancelamento\",\n    \"codigo\": \"110111\",\n    \"sequencia\": 1,\n    \"protocolo\": \"135260000000001\",\n    \"registrado_em\": \"2026-11-22T08:55:03-03:00\",\n    \"texto\": \"Pedido cancelado pelo cliente antes do envio\"\n  },\n  \"monitoramento\": {\n    \"ativo\": false,\n    \"encerra_em\": \"2027-05-20T14:00:00-03:00\",\n    \"motivo_encerramento\": \"cancelada\"\n  }\n}\n```\n\n## Verificar a assinatura\n\n`X-FiscalAPI-Assinatura` = `v1=` + HMAC-SHA256 em hex, com o segredo inteiro (`whsec_...`) como chave, sobre `\"{timestamp}.\" + corpo_bruto`. Na troca de segredo vem `v1=nova,v1=anterior` por 24 h: aceite se qualquer uma bater.\n\n1. Use o corpo **bruto**, antes de interpretar o JSON.\n2. Compare em tempo constante.\n3. Recuse timestamp com mais de 5 minutos de diferença.\n4. Deduplique pelo `id`: a entrega é \"pelo menos uma vez\".\n5. Responda 2xx em até 10 s.\n\n```python\nimport hashlib, hmac, time\n\ndef verificar(corpo: bytes, assinatura: str, timestamp: str, segredo: str) -> bool:\n    if abs(time.time() - int(timestamp)) > 300:\n        return False\n    esperada = hmac.new(segredo.encode(), f\"{timestamp}.\".encode() + corpo, hashlib.sha256).hexdigest()\n    return any(hmac.compare_digest(esperada, p.strip()[3:]) for p in assinatura.split(\",\") if p.strip().startswith(\"v1=\"))\n```\n\nOs SDKs já trazem a verificação: `verificar_assinatura` (Python), `verificarAssinaturaWebhook` (Node.js), `Webhook::verificarAssinatura` (PHP).\n\nSem 2xx, o aviso é reenviado em 1 min, 5 min, 30 min, 2 h, 6 h, 12 h e 24 h; depois fica em `entregas_falhas` na listagem. Com 3 dias seguidos de falha, o webhook é desativado e você recebe um e-mail.",
+      "item": [
+        {
+          "name": "Monitorar chaves de NF-e",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/monitor-nfe/chaves",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "monitor-nfe",
+                "chaves"
+              ]
+            },
+            "description": "Coloca até **1.000 chaves** de NF-e (modelo 55) no monitor. A FiscalAPI verifica a situação de cada nota na SEFAZ ao longo do prazo e avisa no seu webhook quando ela muda (cancelamento, denegação) ou recebe um evento (carta de correção).\n\n- `status_conhecido` (opcional, padrão `autorizada`): o primeiro aviso só sai se a situação atual for diferente.\n- `prazo_dias` (opcional, 1 a 180, padrão 180).\n\nResultado por chave, na mesma ordem: `aceita` (cobrada), `ja_monitorada` (sem nova cobrança) ou `invalida` (com `motivo`, sem cobrança). Sem saldo para todas as aceitas: `402` e nenhuma chave entra.\n\n**Cobrança:** uma vez por chave aceita, cobre todo o acompanhamento.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"chaves\": [\n    { \"chave\": \"{{chaveNfe}}\", \"status_conhecido\": \"autorizada\" }\n  ],\n  \"prazo_dias\": 180\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "200 - Aceita, já monitorada e inválida",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/monitor-nfe/chaves",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "monitor-nfe",
+                    "chaves"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"chaves\": [\n    {\n      \"chave\": \"35261111222333000181550010000001231123456787\",\n      \"status_conhecido\": \"autorizada\"\n    },\n    {\n      \"chave\": \"41261099888777000166550010000004561987654321\"\n    },\n    {\n      \"chave\": \"3526111122233300018155001000000123112345678\"\n    }\n  ],\n  \"prazo_dias\": 180\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"resultados\": [\n    {\n      \"chave\": \"35261111222333000181550010000001231123456787\",\n      \"situacao\": \"aceita\",\n      \"motivo\": null,\n      \"encerra_em\": \"2027-05-20T14:00:00-03:00\"\n    },\n    {\n      \"chave\": \"41261099888777000166550010000004561987654321\",\n      \"situacao\": \"ja_monitorada\",\n      \"motivo\": null,\n      \"encerra_em\": \"2027-05-20T14:00:00-03:00\"\n    },\n    {\n      \"chave\": \"3526111122233300018155001000000123112345678\",\n      \"situacao\": \"invalida\",\n      \"motivo\": \"tamanho\",\n      \"encerra_em\": null\n    }\n  ],\n  \"aceitas\": 1,\n  \"valor_cobrado\": \"0,03\"\n}"
+            },
+            {
+              "name": "402 - LIMITE_ATINGIDO",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/monitor-nfe/chaves",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "monitor-nfe",
+                    "chaves"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"chaves\": [\n    {\n      \"chave\": \"35261111222333000181550010000001231123456787\",\n      \"status_conhecido\": \"autorizada\"\n    },\n    {\n      \"chave\": \"41261099888777000166550010000004561987654321\"\n    },\n    {\n      \"chave\": \"3526111122233300018155001000000123112345678\"\n    }\n  ],\n  \"prazo_dias\": 180\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Payment Required",
+              "code": 402,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/problem+json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"type\": \"urn:fiscalapi:error:limite_atingido\",\n  \"title\": \"LIMITE_ATINGIDO\",\n  \"status\": 402,\n  \"detail\": \"Seu saldo não cobre esta consulta. Compre créditos extras ou assine um plano para continuar.\",\n  \"instance\": \"https://api.fiscalapi.com.br/api/monitor-nfe/chaves\",\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"timestamp\": \"2026-11-21T13:00:00+00:00\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Listar chaves monitoradas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/monitor-nfe/chaves?ativo=true&limite=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "monitor-nfe",
+                "chaves"
+              ],
+              "query": [
+                {
+                  "key": "ativo",
+                  "value": "true",
+                  "description": "true: só monitoramentos correndo; false: só os encerrados."
+                },
+                {
+                  "key": "limite",
+                  "value": "100",
+                  "description": "Itens por página (1 a 1.000)."
+                },
+                {
+                  "key": "status",
+                  "value": "cancelada",
+                  "disabled": true,
+                  "description": "Só notas nesta situação: autorizada, autorizada_fora_prazo, denegada, cancelada, cancelada_fora_prazo, nao_encontrada ou chave_divergente."
+                },
+                {
+                  "key": "alterado_desde",
+                  "value": "2026-11-21T00:00:00-03:00",
+                  "disabled": true,
+                  "description": "Só o que mudou a partir deste instante (sem fuso: horário de Brasília)."
+                },
+                {
+                  "key": "cursor",
+                  "value": "",
+                  "disabled": true,
+                  "description": "`proximo_cursor` da página anterior."
+                }
+              ]
+            },
+            "description": "Lista os monitoramentos da conta, do menos ao mais recentemente alterado, com paginação por cursor: passe o `proximo_cursor` da resposta em `cursor` até ele vir `null`.\n\nUse `alterado_desde` para buscar o que mudou desde a última leitura (por exemplo, se algum aviso do webhook se perdeu). A busca volta 5 minutos antes do instante pedido: itens podem repetir, deduplique por `chave` + `atualizada_em`. `entregas_falhas` conta os avisos que o webhook não recebeu. Não é cobrado."
+          },
+          "response": [
+            {
+              "name": "200 - Sucesso",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/monitor-nfe/chaves?ativo=true&limite=100",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "monitor-nfe",
+                    "chaves"
+                  ],
+                  "query": [
+                    {
+                      "key": "ativo",
+                      "value": "true",
+                      "description": "true: só monitoramentos correndo; false: só os encerrados."
+                    },
+                    {
+                      "key": "limite",
+                      "value": "100",
+                      "description": "Itens por página (1 a 1.000)."
+                    },
+                    {
+                      "key": "status",
+                      "value": "cancelada",
+                      "disabled": true,
+                      "description": "Só notas nesta situação: autorizada, autorizada_fora_prazo, denegada, cancelada, cancelada_fora_prazo, nao_encontrada ou chave_divergente."
+                    },
+                    {
+                      "key": "alterado_desde",
+                      "value": "2026-11-21T00:00:00-03:00",
+                      "disabled": true,
+                      "description": "Só o que mudou a partir deste instante (sem fuso: horário de Brasília)."
+                    },
+                    {
+                      "key": "cursor",
+                      "value": "",
+                      "disabled": true,
+                      "description": "`proximo_cursor` da página anterior."
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"itens\": [\n    {\n      \"chave\": \"41261099888777000166550010000004561987654321\",\n      \"status\": \"autorizada\",\n      \"ativo\": true,\n      \"criada_em\": \"2026-11-21T14:00:00-03:00\",\n      \"encerra_em\": \"2027-05-20T14:00:00-03:00\",\n      \"encerrada_em\": null,\n      \"motivo_encerramento\": null,\n      \"ultima_verificacao_em\": \"2026-11-21T15:00:02-03:00\",\n      \"proxima_verificacao_em\": \"2026-11-21T20:00:00-03:00\",\n      \"atualizada_em\": \"2026-11-21T14:00:01-03:00\",\n      \"entregas_falhas\": 0\n    },\n    {\n      \"chave\": \"35261111222333000181550010000001231123456787\",\n      \"status\": \"cancelada\",\n      \"ativo\": false,\n      \"criada_em\": \"2026-11-21T14:00:00-03:00\",\n      \"encerra_em\": \"2027-05-20T14:00:00-03:00\",\n      \"encerrada_em\": \"2026-11-22T09:12:40-03:00\",\n      \"motivo_encerramento\": \"cancelada\",\n      \"ultima_verificacao_em\": \"2026-11-22T09:12:40-03:00\",\n      \"proxima_verificacao_em\": null,\n      \"atualizada_em\": \"2026-11-22T09:12:40-03:00\",\n      \"entregas_falhas\": 0\n    }\n  ],\n  \"proximo_cursor\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Consultar uma chave monitorada",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/monitor-nfe/chaves/{{chaveNfe}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "monitor-nfe",
+                "chaves",
+                "{{chaveNfe}}"
+              ]
+            },
+            "description": "Situação atual, eventos registrados na nota, próxima verificação, fim do monitoramento e os avisos que o webhook não recebeu (`entregas_que_falharam`). Não é cobrado."
+          },
+          "response": [
+            {
+              "name": "200 - Nota cancelada",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/monitor-nfe/chaves/35261111222333000181550010000001231123456787",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "monitor-nfe",
+                    "chaves",
+                    "35261111222333000181550010000001231123456787"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"chave\": \"35261111222333000181550010000001231123456787\",\n  \"status\": \"cancelada\",\n  \"ativo\": false,\n  \"criada_em\": \"2026-11-21T14:00:00-03:00\",\n  \"encerra_em\": \"2027-05-20T14:00:00-03:00\",\n  \"encerrada_em\": \"2026-11-22T09:12:40-03:00\",\n  \"motivo_encerramento\": \"cancelada\",\n  \"ultima_verificacao_em\": \"2026-11-22T09:12:40-03:00\",\n  \"proxima_verificacao_em\": null,\n  \"atualizada_em\": \"2026-11-22T09:12:40-03:00\",\n  \"entregas_falhas\": 0,\n  \"eventos\": [\n    {\n      \"tipo\": \"cancelamento\",\n      \"codigo\": \"110111\",\n      \"sequencia\": 1,\n      \"protocolo\": \"135260000000001\",\n      \"registrado_em\": \"2026-11-22T08:55:03-03:00\",\n      \"texto\": \"Pedido cancelado pelo cliente antes do envio\"\n    }\n  ],\n  \"entregas_que_falharam\": []\n}"
+            },
+            {
+              "name": "404 - MONITORAMENTO_NAO_ENCONTRADO",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/monitor-nfe/chaves/35261111222333000181550010000001231123456787",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "monitor-nfe",
+                    "chaves",
+                    "35261111222333000181550010000001231123456787"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/problem+json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"type\": \"urn:fiscalapi:error:monitoramento_nao_encontrado\",\n  \"title\": \"MONITORAMENTO_NAO_ENCONTRADO\",\n  \"status\": 404,\n  \"detail\": \"Esta chave não está no monitor da conta.\",\n  \"instance\": \"https://api.fiscalapi.com.br/api/monitor-nfe/chaves/35261111222333000181550010000001231123456787\",\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"timestamp\": \"2026-11-21T13:00:00+00:00\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Parar de monitorar chaves",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/monitor-nfe/chaves/remover",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "monitor-nfe",
+                "chaves",
+                "remover"
+              ]
+            },
+            "description": "Encerra o monitoramento de até 1.000 chaves da conta. Não há estorno e não sai aviso no webhook. Não é cobrado.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"chaves\": [\"{{chaveNfe}}\"]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "200 - Sucesso",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/monitor-nfe/chaves/remover",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "monitor-nfe",
+                    "chaves",
+                    "remover"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"chaves\": [\n    \"35261111222333000181550010000001231123456787\",\n    \"41261099888777000166550010000004561987654321\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"removidas\": 1,\n  \"nao_encontradas\": [\n    \"41261099888777000166550010000004561987654321\"\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Parar de monitorar uma chave",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/monitor-nfe/chaves/{{chaveNfe}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "monitor-nfe",
+                "chaves",
+                "{{chaveNfe}}"
+              ]
+            },
+            "description": "Encerra o monitoramento de uma chave. Não há estorno e não sai aviso no webhook. Não é cobrado."
+          },
+          "response": [
+            {
+              "name": "204 - Removida",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/monitor-nfe/chaves/35261111222333000181550010000001231123456787",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "monitor-nfe",
+                    "chaves",
+                    "35261111222333000181550010000001231123456787"
+                  ]
+                }
+              },
+              "status": "No Content",
+              "code": 204,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            },
+            {
+              "name": "404 - MONITORAMENTO_NAO_ENCONTRADO",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/monitor-nfe/chaves/35261111222333000181550010000001231123456787",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "monitor-nfe",
+                    "chaves",
+                    "35261111222333000181550010000001231123456787"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/problem+json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"type\": \"urn:fiscalapi:error:monitoramento_nao_encontrado\",\n  \"title\": \"MONITORAMENTO_NAO_ENCONTRADO\",\n  \"status\": 404,\n  \"detail\": \"Esta chave não está no monitor da conta.\",\n  \"instance\": \"https://api.fiscalapi.com.br/api/monitor-nfe/chaves/35261111222333000181550010000001231123456787\",\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"timestamp\": \"2026-11-21T13:00:00+00:00\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Cadastrar o webhook",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/monitor-nfe/webhook",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "monitor-nfe",
+                "webhook"
+              ]
+            },
+            "description": "Cadastra (ou troca) a URL que recebe os avisos por POST, uma por conta. Só `https` na porta 443, com nome público (sem IP nem endereço interno) e sem redirecionamento.\n\nDevolve o `segredo` da assinatura **uma única vez**: guarde-o. Cadastrar de novo gera outro segredo e reativa o webhook. Até 10 por hora. Não é cobrado.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"{{webhookUrl}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "200 - Cadastrado",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/monitor-nfe/webhook",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "monitor-nfe",
+                    "webhook"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"url\": \"https://seu-sistema.com.br/fiscalapi/avisos\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"url\": \"https://seu-sistema.com.br/fiscalapi/avisos\",\n  \"segredo\": \"whsec_EXEMPLO_troque_pelo_seu_segredo\"\n}"
+            },
+            {
+              "name": "422 - URL_RECUSADA",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/monitor-nfe/webhook",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "monitor-nfe",
+                    "webhook"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"url\": \"http://192.168.0.10/avisos\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/problem+json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"type\": \"urn:fiscalapi:error:url_recusada\",\n  \"title\": \"URL_RECUSADA\",\n  \"status\": 422,\n  \"detail\": \"URL recusada: use https na porta 443, com um nome público (sem IP nem endereço interno).\",\n  \"instance\": \"https://api.fiscalapi.com.br/api/monitor-nfe/webhook\",\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"timestamp\": \"2026-11-21T13:00:00+00:00\",\n  \"motivo\": \"esquema_nao_https\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Consultar o webhook",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/monitor-nfe/webhook",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "monitor-nfe",
+                "webhook"
+              ]
+            },
+            "description": "URL cadastrada e se os avisos estão saindo. `ativo: false` quando os avisos falharam por 3 dias seguidos: cadastre de novo para reativar. O segredo não volta aqui. Não é cobrado."
+          },
+          "response": [
+            {
+              "name": "200 - Sucesso",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/monitor-nfe/webhook",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "monitor-nfe",
+                    "webhook"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"url\": \"https://seu-sistema.com.br/fiscalapi/avisos\",\n  \"ativo\": true,\n  \"falhando_desde\": null\n}"
+            },
+            {
+              "name": "404 - WEBHOOK_NAO_CADASTRADO",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/monitor-nfe/webhook",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "monitor-nfe",
+                    "webhook"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/problem+json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"type\": \"urn:fiscalapi:error:webhook_nao_cadastrado\",\n  \"title\": \"WEBHOOK_NAO_CADASTRADO\",\n  \"status\": 404,\n  \"detail\": \"Nenhum webhook cadastrado. Cadastre com PUT /api/monitor-nfe/webhook.\",\n  \"instance\": \"https://api.fiscalapi.com.br/api/monitor-nfe/webhook\",\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"timestamp\": \"2026-11-21T13:00:00+00:00\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Trocar o segredo do webhook",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/monitor-nfe/webhook/rotacionar-segredo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "monitor-nfe",
+                "webhook",
+                "rotacionar-segredo"
+              ]
+            },
+            "description": "Gera um segredo novo, mostrado **uma única vez**. Por 24 horas os avisos levam as duas assinaturas no cabeçalho (`v1=nova,v1=anterior`), para você trocar sem perder aviso. Não é cobrado."
+          },
+          "response": [
+            {
+              "name": "200 - Sucesso",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/monitor-nfe/webhook/rotacionar-segredo",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "monitor-nfe",
+                    "webhook",
+                    "rotacionar-segredo"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"segredo\": \"whsec_EXEMPLO_segredo_novo\",\n  \"anterior_valido_ate\": \"2026-11-22T14:00:00-03:00\"\n}"
+            },
+            {
+              "name": "404 - WEBHOOK_NAO_CADASTRADO",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/monitor-nfe/webhook/rotacionar-segredo",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "monitor-nfe",
+                    "webhook",
+                    "rotacionar-segredo"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/problem+json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"type\": \"urn:fiscalapi:error:webhook_nao_cadastrado\",\n  \"title\": \"WEBHOOK_NAO_CADASTRADO\",\n  \"status\": 404,\n  \"detail\": \"Nenhum webhook cadastrado. Cadastre com PUT /api/monitor-nfe/webhook.\",\n  \"instance\": \"https://api.fiscalapi.com.br/api/monitor-nfe/webhook/rotacionar-segredo\",\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"timestamp\": \"2026-11-21T13:00:00+00:00\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Enviar um aviso de teste",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/monitor-nfe/webhook/teste",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "monitor-nfe",
+                "webhook",
+                "teste"
+              ]
+            },
+            "description": "Enfileira um aviso `tipo: teste` para o webhook cadastrado, assinado como os demais. O corpo traz só `id`, `tipo` e `ocorrido_em`. Até 10 por hora. Não é cobrado."
+          },
+          "response": [
+            {
+              "name": "202 - Enfileirado",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/monitor-nfe/webhook/teste",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "monitor-nfe",
+                    "webhook",
+                    "teste"
+                  ]
+                }
+              },
+              "status": "Accepted",
+              "code": 202,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"id\": \"evt_0123456789abcdef0123456789abcdef\",\n  \"estado\": \"pendente\"\n}"
+            },
+            {
+              "name": "409 - WEBHOOK_INATIVO",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/monitor-nfe/webhook/teste",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "monitor-nfe",
+                    "webhook",
+                    "teste"
+                  ]
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/problem+json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"type\": \"urn:fiscalapi:error:webhook_inativo\",\n  \"title\": \"WEBHOOK_INATIVO\",\n  \"status\": 409,\n  \"detail\": \"O webhook foi desativado por falhas seguidas. Cadastre de novo para reativar.\",\n  \"instance\": \"https://api.fiscalapi.com.br/api/monitor-nfe/webhook/teste\",\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"timestamp\": \"2026-11-21T13:00:00+00:00\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Remover o webhook",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/monitor-nfe/webhook",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "monitor-nfe",
+                "webhook"
+              ]
+            },
+            "description": "Remove o webhook. O monitoramento continua e a listagem segue mostrando as mudanças; só os avisos param. Não é cobrado."
+          },
+          "response": [
+            {
+              "name": "204 - Removido",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/monitor-nfe/webhook",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "monitor-nfe",
+                    "webhook"
+                  ]
+                }
+              },
+              "status": "No Content",
+              "code": 204,
+              "_postman_previewlanguage": "text",
+              "header": [],
+              "cookie": [],
+              "body": ""
+            },
+            {
+              "name": "404 - WEBHOOK_NAO_CADASTRADO",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/monitor-nfe/webhook",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "monitor-nfe",
+                    "webhook"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/problem+json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"type\": \"urn:fiscalapi:error:webhook_nao_cadastrado\",\n  \"title\": \"WEBHOOK_NAO_CADASTRADO\",\n  \"status\": 404,\n  \"detail\": \"Nenhum webhook cadastrado. Cadastre com PUT /api/monitor-nfe/webhook.\",\n  \"instance\": \"https://api.fiscalapi.com.br/api/monitor-nfe/webhook\",\n  \"request_id\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"timestamp\": \"2026-11-21T13:00:00+00:00\"\n}"
             }
           ]
         }
