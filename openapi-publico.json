@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "FiscalAPI",
-    "description": "API REST da FiscalAPI para consultar inscrição estadual (IE) nos 27 estados, CNPJ, certidões negativas estaduais e federais, XML de NF-e e de CT-e pela chave de acesso, NFS-e do padrão nacional pela chave de acesso, DIFAL de saída por UF de destino, imóveis rurais (CNIR e SIGEF), Simples Nacional, status da SEFAZ e o catálogo de rejeições da NF-e.\n\nAutenticação: envie a sua chave no cabeçalho `X-API-Key`. A chave é criada no painel (app.fiscalapi.com.br); sem ela, ou com chave inválida, a resposta é 403.\n\nCobrança: as consultas usam o saldo do plano. Sem plano ou saldo, a chamada devolve 402. Para testar antes de assinar, use as 10 consultas grátis do mês no painel. Limite por minuto conforme o plano; acima dele, 429 com o cabeçalho Retry-After.\n\nDocumentação completa: https://docs.fiscalapi.com.br",
+    "description": "API REST da FiscalAPI para consultar inscrição estadual (IE) nos 27 estados, CNPJ, certidões negativas estaduais e federais, XML de NF-e e de CT-e pela chave de acesso, NFS-e do padrão nacional pela chave de acesso, emissão de NFS-e do padrão nacional, DIFAL de saída por UF de destino, imóveis rurais (CNIR e SIGEF), Simples Nacional, status da SEFAZ e o catálogo de rejeições da NF-e.\n\nAutenticação: envie a sua chave no cabeçalho `X-API-Key`. A chave é criada no painel (app.fiscalapi.com.br); sem ela, ou com chave inválida, a resposta é 403.\n\nCobrança: as consultas usam o saldo do plano. Sem plano ou saldo, a chamada devolve 402. Para testar antes de assinar, use as 10 consultas grátis do mês no painel. Limite por minuto conforme o plano; acima dele, 429 com o cabeçalho Retry-After.\n\nDocumentação completa: https://docs.fiscalapi.com.br",
     "version": "1.0.0"
   },
   "servers": [
@@ -3455,10 +3455,1838 @@
           }
         }
       }
+    },
+    "/api/nfse/empresas": {
+      "post": {
+        "tags": [
+          "Emissão de NFS-e"
+        ],
+        "summary": "Cadastrar empresa emissora",
+        "operationId": "cadastrar_empresa_api_nfse_empresas_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmpresaIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmpresaOut"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Chave ausente, inválida ou revogada.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Não encontrado nesta conta. Código em `title`: `NFSE_CERTIFICADO_NAO_ENCONTRADO`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito com o estado atual. Código em `title`: `NFSE_CERTIFICADO_AUSENTE`, `NFSE_EMPRESA_JA_CADASTRADA`, `NFSE_CNPJ_EM_OUTRA_CONTA`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de requisições por minuto excedido. Veja o cabeçalho Retry-After.",
+            "headers": {
+              "Retry-After": {
+                "description": "Segundos até poder tentar de novo.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroLimite"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Indisponível agora; tente de novo. Código em `title`: `FEATURE_UNDER_REVIEW`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Emissão de NFS-e"
+        ],
+        "summary": "Listar empresas emissoras",
+        "operationId": "listar_empresas_api_nfse_empresas_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EmpresaOut"
+                  },
+                  "title": "Response Listar Empresas Api Nfse Empresas Get"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Chave ausente, inválida ou revogada.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de requisições por minuto excedido. Veja o cabeçalho Retry-After.",
+            "headers": {
+              "Retry-After": {
+                "description": "Segundos até poder tentar de novo.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroLimite"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Indisponível agora; tente de novo. Código em `title`: `FEATURE_UNDER_REVIEW`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/nfse/empresas/{empresa_id}": {
+      "get": {
+        "tags": [
+          "Emissão de NFS-e"
+        ],
+        "summary": "Consultar empresa emissora",
+        "operationId": "obter_empresa_api_nfse_empresas__empresa_id__get",
+        "parameters": [
+          {
+            "name": "empresa_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Empresa Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmpresaOut"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Chave ausente, inválida ou revogada.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Não encontrado nesta conta. Código em `title`: `NFSE_EMPRESA_NAO_ENCONTRADA`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de requisições por minuto excedido. Veja o cabeçalho Retry-After.",
+            "headers": {
+              "Retry-After": {
+                "description": "Segundos até poder tentar de novo.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroLimite"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Indisponível agora; tente de novo. Código em `title`: `FEATURE_UNDER_REVIEW`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Emissão de NFS-e"
+        ],
+        "summary": "Editar empresa emissora",
+        "operationId": "editar_empresa_api_nfse_empresas__empresa_id__patch",
+        "parameters": [
+          {
+            "name": "empresa_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Empresa Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmpresaPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmpresaOut"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Chave ausente, inválida ou revogada.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Não encontrado nesta conta. Código em `title`: `NFSE_EMPRESA_NAO_ENCONTRADA`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito com o estado atual. Código em `title`: `NFSE_CERTIFICADO_AUSENTE`, `NFSE_CNPJ_EM_OUTRA_CONTA`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de requisições por minuto excedido. Veja o cabeçalho Retry-After.",
+            "headers": {
+              "Retry-After": {
+                "description": "Segundos até poder tentar de novo.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroLimite"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Indisponível agora; tente de novo. Código em `title`: `FEATURE_UNDER_REVIEW`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/nfse/certificados": {
+      "put": {
+        "tags": [
+          "Emissão de NFS-e"
+        ],
+        "summary": "Enviar certificado A1 (.pfx)",
+        "operationId": "enviar_certificado_api_nfse_certificados_put",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_enviar_certificado_api_nfse_certificados_put"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CertificadoOut"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Chave ausente, inválida ou revogada.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de requisições por minuto excedido. Veja o cabeçalho Retry-After.",
+            "headers": {
+              "Retry-After": {
+                "description": "Segundos até poder tentar de novo.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroLimite"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Indisponível agora; tente de novo. Código em `title`: `PFX_OCUPADO`, `ERRO_ABRIR_CERTIFICADO`, `FEATURE_UNDER_REVIEW`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/nfse/certificados/{raiz}": {
+      "delete": {
+        "tags": [
+          "Emissão de NFS-e"
+        ],
+        "summary": "Excluir certificado",
+        "operationId": "excluir_certificado_api_nfse_certificados__raiz__delete",
+        "parameters": [
+          {
+            "name": "raiz",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Raiz"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "403": {
+            "description": "Chave ausente, inválida ou revogada.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Não encontrado nesta conta. Código em `title`: `NFSE_CERTIFICADO_NAO_ENCONTRADO`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito com o estado atual. Código em `title`: `NFSE_CERTIFICADO_EM_USO`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de requisições por minuto excedido. Veja o cabeçalho Retry-After.",
+            "headers": {
+              "Retry-After": {
+                "description": "Segundos até poder tentar de novo.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroLimite"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Indisponível agora; tente de novo. Código em `title`: `FEATURE_UNDER_REVIEW`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/nfse/notas": {
+      "post": {
+        "tags": [
+          "Emissão de NFS-e"
+        ],
+        "summary": "Emitir NFS-e (assíncrono)",
+        "operationId": "emitir_nota_api_nfse_notas_post",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NotaIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotaOut"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou compre créditos extras.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Chave ausente, inválida ou revogada.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Não encontrado nesta conta. Código em `title`: `NFSE_EMPRESA_NAO_ENCONTRADA`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito com o estado atual. Código em `title`: `NFSE_REFERENCIA_EM_USO`, `NFSE_NUMERACAO_EM_USO`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de requisições por minuto excedido. Veja o cabeçalho Retry-After.",
+            "headers": {
+              "Retry-After": {
+                "description": "Segundos até poder tentar de novo.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroLimite"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Indisponível agora; tente de novo. Código em `title`: `FEATURE_UNDER_REVIEW`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Emissão de NFS-e"
+        ],
+        "summary": "Listar NFS-e",
+        "operationId": "listar_notas_api_nfse_notas_get",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "pendente",
+                    "processando",
+                    "autorizada",
+                    "rejeitada",
+                    "cancelando",
+                    "cancelada",
+                    "substituida"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "name": "ambiente",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "homologacao",
+                    "producao"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ambiente"
+            }
+          },
+          {
+            "name": "referencia",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 64
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Referencia"
+            }
+          },
+          {
+            "name": "atualizada_desde",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Atualizada Desde"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 200
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "name": "limite",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limite"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotaPagina"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Chave ausente, inválida ou revogada.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de requisições por minuto excedido. Veja o cabeçalho Retry-After.",
+            "headers": {
+              "Retry-After": {
+                "description": "Segundos até poder tentar de novo.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroLimite"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Indisponível agora; tente de novo. Código em `title`: `FEATURE_UNDER_REVIEW`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/nfse/notas/{nota_id}": {
+      "get": {
+        "tags": [
+          "Emissão de NFS-e"
+        ],
+        "summary": "Consultar NFS-e",
+        "operationId": "obter_nota_api_nfse_notas__nota_id__get",
+        "parameters": [
+          {
+            "name": "nota_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Nota Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotaOut"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Chave ausente, inválida ou revogada.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Não encontrado nesta conta. Código em `title`: `NFSE_NOTA_NAO_ENCONTRADA`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de requisições por minuto excedido. Veja o cabeçalho Retry-After.",
+            "headers": {
+              "Retry-After": {
+                "description": "Segundos até poder tentar de novo.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroLimite"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Indisponível agora; tente de novo. Código em `title`: `FEATURE_UNDER_REVIEW`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/nfse/notas/{nota_id}/xml": {
+      "get": {
+        "tags": [
+          "Emissão de NFS-e"
+        ],
+        "summary": "Baixar o XML da NFS-e autorizada",
+        "operationId": "baixar_xml_da_nota_api_nfse_notas__nota_id__xml_get",
+        "parameters": [
+          {
+            "name": "nota_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Nota Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "XML da NFS-e autorizada.",
+            "content": {
+              "application/xml": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Chave ausente, inválida ou revogada.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Não encontrado nesta conta. Código em `title`: `NFSE_NOTA_NAO_ENCONTRADA`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito com o estado atual. Código em `title`: `NFSE_NOTA_SEM_XML`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de requisições por minuto excedido. Veja o cabeçalho Retry-After.",
+            "headers": {
+              "Retry-After": {
+                "description": "Segundos até poder tentar de novo.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroLimite"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Indisponível agora; tente de novo. Código em `title`: `FEATURE_UNDER_REVIEW`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/nfse/notas/{nota_id}/pdf": {
+      "get": {
+        "tags": [
+          "Emissão de NFS-e"
+        ],
+        "summary": "Baixar o DANFSe (PDF) da NFS-e",
+        "operationId": "baixar_danfse_da_nota_api_nfse_notas__nota_id__pdf_get",
+        "parameters": [
+          {
+            "name": "nota_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Nota Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PDF do DANFSe.",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Chave ausente, inválida ou revogada.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Não encontrado nesta conta. Código em `title`: `NFSE_NOTA_NAO_ENCONTRADA`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito com o estado atual. Código em `title`: `NFSE_NOTA_SEM_XML`, `NFSE_DANFSE_XML_ILEGIVEL`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de requisições por minuto excedido. Veja o cabeçalho Retry-After.",
+            "headers": {
+              "Retry-After": {
+                "description": "Segundos até poder tentar de novo.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroLimite"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Indisponível agora; tente de novo. Código em `title`: `NFSE_PDF_OCUPADO`, `FEATURE_UNDER_REVIEW`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/nfse/notas/{nota_id}/cancelamento": {
+      "post": {
+        "tags": [
+          "Emissão de NFS-e"
+        ],
+        "summary": "Cancelar NFS-e (assíncrono)",
+        "operationId": "cancelar_nota_api_nfse_notas__nota_id__cancelamento_post",
+        "parameters": [
+          {
+            "name": "nota_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Nota Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelamentoIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotaOut"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Chave ausente, inválida ou revogada.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Não encontrado nesta conta. Código em `title`: `NFSE_NOTA_NAO_ENCONTRADA`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito com o estado atual. Código em `title`: `NFSE_NAO_CANCELAVEL`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de requisições por minuto excedido. Veja o cabeçalho Retry-After.",
+            "headers": {
+              "Retry-After": {
+                "description": "Segundos até poder tentar de novo.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroLimite"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Indisponível agora; tente de novo. Código em `title`: `FEATURE_UNDER_REVIEW`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/nfse/notas/{nota_id}/substituicao": {
+      "post": {
+        "tags": [
+          "Emissão de NFS-e"
+        ],
+        "summary": "Substituir NFS-e (assíncrono)",
+        "operationId": "substituir_nota_api_nfse_notas__nota_id__substituicao_post",
+        "parameters": [
+          {
+            "name": "nota_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Nota Id"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubstituicaoIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotaOut"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Saldo insuficiente para esta consulta. Assine um plano ou compre créditos extras.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Chave ausente, inválida ou revogada.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Não encontrado nesta conta. Código em `title`: `NFSE_NOTA_NAO_ENCONTRADA`, `NFSE_EMPRESA_NAO_ENCONTRADA`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito com o estado atual. Código em `title`: `NFSE_NAO_SUBSTITUIVEL`, `NFSE_REFERENCIA_EM_USO`, `NFSE_NUMERACAO_EM_USO`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de requisições por minuto excedido. Veja o cabeçalho Retry-After.",
+            "headers": {
+              "Retry-After": {
+                "description": "Segundos até poder tentar de novo.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroLimite"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Indisponível agora; tente de novo. Código em `title`: `FEATURE_UNDER_REVIEW`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/nfse/notas/{nota_id}/webhook": {
+      "post": {
+        "tags": [
+          "Emissão de NFS-e"
+        ],
+        "summary": "Reenviar o webhook de uma NFS-e",
+        "operationId": "reenviar_webhook_da_nota_api_nfse_notas__nota_id__webhook_post",
+        "parameters": [
+          {
+            "name": "nota_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Nota Id"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReenvioOut"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Chave ausente, inválida ou revogada.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Não encontrado nesta conta. Código em `title`: `NFSE_NOTA_NAO_ENCONTRADA`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflito com o estado atual. Código em `title`: `NFSE_WEBHOOK_NAO_CONFIGURADO`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de requisições por minuto excedido. Veja o cabeçalho Retry-After.",
+            "headers": {
+              "Retry-After": {
+                "description": "Segundos até poder tentar de novo.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroLimite"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Indisponível agora; tente de novo. Código em `title`: `FEATURE_UNDER_REVIEW`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/nfse/webhook": {
+      "put": {
+        "tags": [
+          "Emissão de NFS-e"
+        ],
+        "summary": "Configurar webhook",
+        "operationId": "configurar_webhook_api_nfse_webhook_put",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebhookIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookCriadoOut"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Chave ausente, inválida ou revogada.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de requisições por minuto excedido. Veja o cabeçalho Retry-After.",
+            "headers": {
+              "Retry-After": {
+                "description": "Segundos até poder tentar de novo.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroLimite"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Indisponível agora; tente de novo. Código em `title`: `FEATURE_UNDER_REVIEW`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Emissão de NFS-e"
+        ],
+        "summary": "Consultar webhook",
+        "operationId": "obter_webhook_api_nfse_webhook_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookOut"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Chave ausente, inválida ou revogada.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de requisições por minuto excedido. Veja o cabeçalho Retry-After.",
+            "headers": {
+              "Retry-After": {
+                "description": "Segundos até poder tentar de novo.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroLimite"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Indisponível agora; tente de novo. Código em `title`: `FEATURE_UNDER_REVIEW`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Emissão de NFS-e"
+        ],
+        "summary": "Remover webhook",
+        "operationId": "remover_webhook_api_nfse_webhook_delete",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "403": {
+            "description": "Chave ausente, inválida ou revogada.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Limite de requisições por minuto excedido. Veja o cabeçalho Retry-After.",
+            "headers": {
+              "Retry-After": {
+                "description": "Segundos até poder tentar de novo.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroLimite"
+                }
+              },
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Indisponível agora; tente de novo. Código em `title`: `FEATURE_UNDER_REVIEW`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErroProblema"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "BemMovelIn": {
+        "properties": {
+          "ncm": {
+            "type": "string",
+            "pattern": "^\\d{8}$",
+            "title": "Ncm"
+          },
+          "descricao": {
+            "type": "string",
+            "maxLength": 150,
+            "minLength": 1,
+            "title": "Descricao"
+          },
+          "quantidade": {
+            "type": "integer",
+            "maximum": 999.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Quantidade"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "ncm",
+          "descricao",
+          "quantidade"
+        ],
+        "title": "BemMovelIn"
+      },
+      "Body_enviar_certificado_api_nfse_certificados_put": {
+        "properties": {
+          "certificado": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "Certificado"
+          },
+          "senha": {
+            "type": "string",
+            "title": "Senha",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "required": [
+          "certificado"
+        ],
+        "title": "Body_enviar_certificado_api_nfse_certificados_put"
+      },
       "CNDResponse": {
         "properties": {
           "request_id": {
@@ -4224,6 +6052,34 @@
         ],
         "title": "CadastroResponse"
       },
+      "CancelamentoIn": {
+        "properties": {
+          "motivo": {
+            "type": "integer",
+            "enum": [
+              1,
+              2,
+              9
+            ],
+            "title": "Motivo",
+            "description": "1 erro na emissão, 2 serviço não prestado, 9 outros."
+          },
+          "justificativa": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 15,
+            "title": "Justificativa",
+            "description": "Texto do motivo (xMotivo), de 15 a 255 caracteres."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "motivo",
+          "justificativa"
+        ],
+        "title": "CancelamentoIn"
+      },
       "CertidaoFederalResponse": {
         "properties": {
           "request_id": {
@@ -4438,6 +6294,54 @@
             "request_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
           }
         ]
+      },
+      "CertificadoOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "cnpj_raiz": {
+            "type": "string",
+            "title": "Cnpj Raiz"
+          },
+          "titular_cnpj": {
+            "type": "string",
+            "title": "Titular Cnpj"
+          },
+          "fingerprint": {
+            "type": "string",
+            "title": "Fingerprint"
+          },
+          "valido_ate": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Valido Ate"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "cnpj_raiz",
+          "titular_cnpj",
+          "fingerprint",
+          "valido_ate",
+          "created_at"
+        ],
+        "title": "CertificadoOut"
       },
       "ChaveMonitorada": {
         "properties": {
@@ -5492,6 +7396,40 @@
         ],
         "title": "CteXmlResponse"
       },
+      "DestinatarioIn": {
+        "properties": {
+          "tipo": {
+            "type": "string",
+            "enum": [
+              "cpf",
+              "cnpj"
+            ],
+            "title": "Tipo"
+          },
+          "documento": {
+            "type": "string",
+            "title": "Documento"
+          },
+          "nome": {
+            "type": "string",
+            "maxLength": 150,
+            "minLength": 1,
+            "title": "Nome"
+          },
+          "endereco": {
+            "$ref": "#/components/schemas/EnderecoNacIn"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "tipo",
+          "documento",
+          "nome",
+          "endereco"
+        ],
+        "title": "DestinatarioIn"
+      },
       "DifalSaidaRequest": {
         "properties": {
           "certificado": {
@@ -5648,6 +7586,449 @@
           "creditos_cobrados"
         ],
         "title": "DifalSaidaResponse"
+      },
+      "EmpresaIn": {
+        "properties": {
+          "cnpj": {
+            "type": "string",
+            "maxLength": 18,
+            "minLength": 14,
+            "title": "Cnpj",
+            "description": "CNPJ da empresa (pontuação é ignorada)."
+          },
+          "razao_social": {
+            "type": "string",
+            "maxLength": 150,
+            "minLength": 1,
+            "title": "Razao Social"
+          },
+          "im": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 15,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Im",
+            "description": "Inscrição municipal, se houver."
+          },
+          "cod_mun_ibge": {
+            "type": "string",
+            "pattern": "^\\d{7}$",
+            "title": "Cod Mun Ibge",
+            "description": "Município do estabelecimento (IBGE, 7 dígitos)."
+          },
+          "regime": {
+            "$ref": "#/components/schemas/RegimeIn"
+          },
+          "auth_modo": {
+            "type": "string",
+            "maxLength": 12,
+            "title": "Auth Modo",
+            "description": "Só \"certificado\" (o A1 da própria empresa, da mesma raiz do CNPJ).",
+            "default": "certificado"
+          },
+          "certificado_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Certificado Id"
+          },
+          "serie": {
+            "type": "string",
+            "title": "Serie",
+            "description": "Série da DPS, de 00001 a 49999."
+          },
+          "primeiro_ndps_producao": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Primeiro Ndps Producao",
+            "description": "Primeiro número de DPS em produção (padrão 1). Use para continuar uma numeração."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "cnpj",
+          "razao_social",
+          "cod_mun_ibge",
+          "regime",
+          "serie"
+        ],
+        "title": "EmpresaIn"
+      },
+      "EmpresaOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "cnpj": {
+            "type": "string",
+            "title": "Cnpj"
+          },
+          "razao_social": {
+            "type": "string",
+            "title": "Razao Social"
+          },
+          "im": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Im"
+          },
+          "cod_mun_ibge": {
+            "type": "string",
+            "title": "Cod Mun Ibge"
+          },
+          "regime": {
+            "$ref": "#/components/schemas/RegimeOut"
+          },
+          "auth_modo": {
+            "type": "string",
+            "title": "Auth Modo"
+          },
+          "certificado_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Certificado Id"
+          },
+          "serie": {
+            "type": "string",
+            "title": "Serie"
+          },
+          "proximo_ndps_producao": {
+            "type": "integer",
+            "title": "Proximo Ndps Producao"
+          },
+          "proximo_ndps_homologacao": {
+            "type": "integer",
+            "title": "Proximo Ndps Homologacao"
+          },
+          "ativa": {
+            "type": "boolean",
+            "title": "Ativa"
+          },
+          "verificada": {
+            "type": "boolean",
+            "title": "Verificada"
+          },
+          "verificada_em": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verificada Em"
+          },
+          "convenio_ok": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Convenio Ok"
+          },
+          "avisos": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Avisos"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "cnpj",
+          "razao_social",
+          "im",
+          "cod_mun_ibge",
+          "regime",
+          "auth_modo",
+          "certificado_id",
+          "serie",
+          "proximo_ndps_producao",
+          "proximo_ndps_homologacao",
+          "ativa",
+          "verificada",
+          "verificada_em",
+          "convenio_ok",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "EmpresaOut"
+      },
+      "EmpresaPatch": {
+        "properties": {
+          "razao_social": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 150,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Razao Social"
+          },
+          "im": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 15,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Im"
+          },
+          "cod_mun_ibge": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^\\d{7}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cod Mun Ibge"
+          },
+          "regime": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RegimeIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ativa": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ativa",
+            "description": "false desliga a empresa; true religa (confere a posse de novo)."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "EmpresaPatch"
+      },
+      "EnderecoExtIn": {
+        "properties": {
+          "cod_pais": {
+            "type": "string",
+            "pattern": "^[A-Z]{2}$",
+            "title": "Cod Pais"
+          },
+          "cod_postal": {
+            "type": "string",
+            "maxLength": 11,
+            "minLength": 1,
+            "title": "Cod Postal"
+          },
+          "cidade": {
+            "type": "string",
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Cidade"
+          },
+          "estado_provincia": {
+            "type": "string",
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Estado Provincia"
+          },
+          "logradouro": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Logradouro"
+          },
+          "numero": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 60
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Numero"
+          },
+          "complemento": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 156
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Complemento"
+          },
+          "bairro": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 60
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bairro"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "cod_pais",
+          "cod_postal",
+          "cidade",
+          "estado_provincia",
+          "logradouro"
+        ],
+        "title": "EnderecoExtIn"
+      },
+      "EnderecoNacIn": {
+        "properties": {
+          "cep": {
+            "type": "string",
+            "pattern": "^\\d{8}$",
+            "title": "Cep"
+          },
+          "cod_mun_ibge": {
+            "type": "string",
+            "pattern": "^\\d{7}$",
+            "title": "Cod Mun Ibge"
+          },
+          "logradouro": {
+            "type": "string",
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Logradouro"
+          },
+          "numero": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 60
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Numero"
+          },
+          "complemento": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 156
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Complemento"
+          },
+          "bairro": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 60
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bairro"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "cep",
+          "cod_mun_ibge",
+          "logradouro"
+        ],
+        "title": "EnderecoNacIn"
       },
       "EntregaFalha": {
         "properties": {
@@ -6235,6 +8616,117 @@
             "uf_ie": "MT"
           }
         ]
+      },
+      "IbsCbsIn": {
+        "properties": {
+          "cclass_trib": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^\\d{6}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cclass Trib"
+          },
+          "cst": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^\\d{3}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cst"
+          },
+          "cind_op": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^\\d{6}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cind Op"
+          },
+          "ind_final": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "enum": [
+                  0,
+                  1
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ind Final"
+          },
+          "tp_oper": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 5.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tp Oper"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "IbsCbsIn"
+      },
+      "IssIn": {
+        "properties": {
+          "tributacao": {
+            "type": "integer",
+            "enum": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "title": "Tributacao"
+          },
+          "retido": {
+            "type": "boolean",
+            "title": "Retido",
+            "default": false
+          },
+          "aliquota": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Aliquota"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "tributacao"
+        ],
+        "title": "IssIn"
       },
       "ListaDeChaves": {
         "properties": {
@@ -7288,6 +9780,458 @@
         ],
         "title": "NotaDifalOut"
       },
+      "NotaIn": {
+        "properties": {
+          "competencia": {
+            "type": "string",
+            "format": "date",
+            "title": "Competencia"
+          },
+          "tomador": {
+            "$ref": "#/components/schemas/TomadorIn"
+          },
+          "destinatario": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DestinatarioIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "servico": {
+            "$ref": "#/components/schemas/ServicoIn"
+          },
+          "valores": {
+            "$ref": "#/components/schemas/ValoresIn"
+          },
+          "ibs_cbs": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IbsCbsIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "bens_moveis": {
+            "items": {
+              "$ref": "#/components/schemas/BemMovelIn"
+            },
+            "type": "array",
+            "maxItems": 1000,
+            "title": "Bens Moveis"
+          },
+          "codigo_interno": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9]{1,20}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Codigo Interno"
+          },
+          "empresa_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Empresa Id"
+          },
+          "ambiente": {
+            "type": "string",
+            "enum": [
+              "homologacao",
+              "producao"
+            ],
+            "title": "Ambiente"
+          },
+          "referencia": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 50
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Referencia"
+          },
+          "preset": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "simples_servico",
+                  "regime_normal_servico",
+                  "locacao_bem_movel"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preset"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "competencia",
+          "tomador",
+          "servico",
+          "valores",
+          "empresa_id",
+          "ambiente"
+        ],
+        "title": "NotaIn"
+      },
+      "NotaOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "ambiente": {
+            "type": "string",
+            "enum": [
+              "homologacao",
+              "producao"
+            ],
+            "title": "Ambiente"
+          },
+          "referencia": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Referencia"
+          },
+          "empresa_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Empresa Id"
+          },
+          "dps_id": {
+            "type": "string",
+            "title": "Dps Id"
+          },
+          "chave_acesso": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chave Acesso"
+          },
+          "erros": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Erros"
+          },
+          "avisos": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Avisos"
+          },
+          "autorizada_em": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Autorizada Em"
+          },
+          "cancelada_em": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cancelada Em"
+          },
+          "substitui_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Substitui Id"
+          },
+          "substituida_por_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Substituida Por Id"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          },
+          "numero_nfse": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Numero Nfse",
+            "description": "Número da NFS-e (nNFSe), quando autorizada."
+          },
+          "erro_codigo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Erro Codigo",
+            "description": "Primeiro código de erro da rejeição."
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "ambiente",
+          "referencia",
+          "empresa_id",
+          "dps_id",
+          "chave_acesso",
+          "erros",
+          "autorizada_em",
+          "cancelada_em",
+          "substitui_id",
+          "substituida_por_id",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "NotaOut"
+      },
+      "NotaPagina": {
+        "properties": {
+          "itens": {
+            "items": {
+              "$ref": "#/components/schemas/NotaOut"
+            },
+            "type": "array",
+            "title": "Itens"
+          },
+          "proximo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Proximo",
+            "description": "Cursor da próxima página (None = acabou)."
+          }
+        },
+        "type": "object",
+        "required": [
+          "itens"
+        ],
+        "title": "NotaPagina"
+      },
+      "ReenvioOut": {
+        "properties": {
+          "reenfileiradas": {
+            "type": "integer",
+            "title": "Reenfileiradas"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reenfileiradas"
+        ],
+        "title": "ReenvioOut"
+      },
+      "RegimeIn": {
+        "properties": {
+          "op_simp_nac": {
+            "type": "integer",
+            "enum": [
+              1,
+              2,
+              3
+            ],
+            "title": "Op Simp Nac",
+            "description": "Situação no Simples Nacional: 1 não optante, 2 MEI, 3 ME/EPP."
+          },
+          "reg_ap_trib_sn": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "enum": [
+                  1,
+                  2,
+                  3
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reg Ap Trib Sn",
+            "description": "Regime de apuração do ME/EPP (obrigatório quando op_simp_nac = 3)."
+          },
+          "reg_esp_trib": {
+            "type": "integer",
+            "enum": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              9
+            ],
+            "title": "Reg Esp Trib",
+            "description": "Regime especial de tributação (0 = nenhum).",
+            "default": 0
+          },
+          "reg_ap_ibscbs_sn": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "enum": [
+                  1,
+                  2,
+                  3
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reg Ap Ibscbs Sn",
+            "description": "Regime de apuração do IBS/CBS do optante do Simples."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "op_simp_nac"
+        ],
+        "title": "RegimeIn"
+      },
+      "RegimeOut": {
+        "properties": {
+          "op_simp_nac": {
+            "type": "integer",
+            "title": "Op Simp Nac"
+          },
+          "reg_ap_trib_sn": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reg Ap Trib Sn"
+          },
+          "reg_esp_trib": {
+            "type": "integer",
+            "title": "Reg Esp Trib"
+          },
+          "reg_ap_ibscbs_sn": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reg Ap Ibscbs Sn"
+          }
+        },
+        "type": "object",
+        "required": [
+          "op_simp_nac",
+          "reg_ap_trib_sn",
+          "reg_esp_trib",
+          "reg_ap_ibscbs_sn"
+        ],
+        "title": "RegimeOut"
+      },
       "RegimeTributarioAno": {
         "properties": {
           "ano": {
@@ -7646,6 +10590,62 @@
           "anterior_valido_ate"
         ],
         "title": "SegredoRotacionado"
+      },
+      "ServicoIn": {
+        "properties": {
+          "codigo_tributacao_nacional": {
+            "type": "string",
+            "title": "Codigo Tributacao Nacional"
+          },
+          "codigo_nbs": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^\\d{9}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Codigo Nbs"
+          },
+          "codigo_atividade_sn": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Codigo Atividade Sn"
+          },
+          "descricao": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Descricao"
+          },
+          "cod_mun_prestacao": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^\\d{7}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cod Mun Prestacao"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "codigo_tributacao_nacional",
+          "descricao"
+        ],
+        "title": "ServicoIn"
       },
       "SigefConfrontante": {
         "properties": {
@@ -8577,6 +11577,109 @@
           }
         ]
       },
+      "SubstituicaoIn": {
+        "properties": {
+          "competencia": {
+            "type": "string",
+            "format": "date",
+            "title": "Competencia"
+          },
+          "tomador": {
+            "$ref": "#/components/schemas/TomadorIn"
+          },
+          "destinatario": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DestinatarioIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "servico": {
+            "$ref": "#/components/schemas/ServicoIn"
+          },
+          "valores": {
+            "$ref": "#/components/schemas/ValoresIn"
+          },
+          "ibs_cbs": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IbsCbsIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "bens_moveis": {
+            "items": {
+              "$ref": "#/components/schemas/BemMovelIn"
+            },
+            "type": "array",
+            "maxItems": 1000,
+            "title": "Bens Moveis"
+          },
+          "codigo_interno": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9]{1,20}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Codigo Interno"
+          },
+          "referencia": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 50
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Referencia"
+          },
+          "motivo": {
+            "type": "string",
+            "enum": [
+              "01",
+              "02",
+              "03",
+              "04",
+              "05",
+              "99"
+            ],
+            "title": "Motivo"
+          },
+          "justificativa": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Justificativa"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "competencia",
+          "tomador",
+          "servico",
+          "valores",
+          "motivo"
+        ],
+        "title": "SubstituicaoIn"
+      },
       "TesteEnfileirado": {
         "properties": {
           "id": {
@@ -8596,6 +11699,156 @@
           "id"
         ],
         "title": "TesteEnfileirado"
+      },
+      "TomadorIn": {
+        "properties": {
+          "tipo": {
+            "type": "string",
+            "enum": [
+              "cpf",
+              "cnpj",
+              "estrangeiro",
+              "nao_identificado"
+            ],
+            "title": "Tipo"
+          },
+          "documento": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Documento"
+          },
+          "nif": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 40
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nif"
+          },
+          "motivo_sem_nif": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "enum": [
+                  1,
+                  2
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motivo Sem Nif"
+          },
+          "nome": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nome"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "endereco": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EnderecoNacIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "endereco_ext": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EnderecoExtIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "tipo"
+        ],
+        "title": "TomadorIn"
+      },
+      "TributosAproximadosIn": {
+        "properties": {
+          "federal": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Federal"
+          },
+          "estadual": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Estadual"
+          },
+          "municipal": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Municipal"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "federal",
+          "estadual",
+          "municipal"
+        ],
+        "title": "TributosAproximadosIn"
       },
       "UFCNDResult": {
         "properties": {
@@ -8814,6 +12067,76 @@
         ],
         "title": "ValidationError"
       },
+      "ValoresIn": {
+        "properties": {
+          "valor_servico": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Valor Servico"
+          },
+          "desconto_incondicionado": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Desconto Incondicionado",
+            "default": "0"
+          },
+          "iss": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IssIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "percentual_tributos_aproximado": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Percentual Tributos Aproximado"
+          },
+          "tributos_aproximados": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TributosAproximadosIn"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "valor_servico"
+        ],
+        "title": "ValoresIn"
+      },
       "WebhookAtual": {
         "properties": {
           "url": {
@@ -8865,6 +12188,127 @@
           "segredo"
         ],
         "title": "WebhookCriado"
+      },
+      "WebhookCriadoOut": {
+        "properties": {
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          },
+          "ativo": {
+            "type": "boolean",
+            "title": "Ativo"
+          },
+          "segredo_final": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Segredo Final",
+            "description": "Últimos 4 caracteres do segredo, para conferência."
+          },
+          "eventos": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Eventos"
+          },
+          "segredo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Segredo",
+            "description": "Segredo do HMAC (X-FiscalAPI-Assinatura). Só na criação, uma vez: guarde-o."
+          }
+        },
+        "type": "object",
+        "required": [
+          "url",
+          "ativo",
+          "segredo_final",
+          "eventos"
+        ],
+        "title": "WebhookCriadoOut"
+      },
+      "WebhookIn": {
+        "properties": {
+          "url": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Url",
+            "description": "https, porta 443, nome de domínio público (sem IP nem rede interna)."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "title": "WebhookIn"
+      },
+      "WebhookOut": {
+        "properties": {
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          },
+          "ativo": {
+            "type": "boolean",
+            "title": "Ativo"
+          },
+          "segredo_final": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Segredo Final",
+            "description": "Últimos 4 caracteres do segredo, para conferência."
+          },
+          "eventos": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Eventos"
+          }
+        },
+        "type": "object",
+        "required": [
+          "url",
+          "ativo",
+          "segredo_final",
+          "eventos"
+        ],
+        "title": "WebhookOut"
       },
       "WebhookRequest": {
         "properties": {
@@ -8953,6 +12397,10 @@
     {
       "name": "Rejeições SEFAZ",
       "description": "Catálogo de rejeições da NF-e com causas e solução."
+    },
+    {
+      "name": "Emissão de NFS-e",
+      "description": "Emite, cancela e substitui NFS-e do padrão nacional com o certificado A1 da própria empresa. A nota é processada em segundos; o resultado chega por webhook ou na consulta da nota. Cobra só a nota autorizada em produção."
     },
     {
       "name": "Monitor de NF-e",
