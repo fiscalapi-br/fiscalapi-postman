@@ -1,4 +1,6 @@
-# FiscalAPI — coleção Postman e OpenAPI
+# FiscalAPI: coleção Postman e OpenAPI
+
+Coleção Postman pronta para testar a API da FiscalAPI: consulta de inscrição estadual (SINTEGRA) nos 27 estados, CNPJ na Receita Federal, certidões (CND estadual, CND Federal, CNDT, CRF/FGTS) e XML de NF-e pela chave de acesso, com exemplos de resposta. Importe o arquivo, cole a chave e envie. Documentação: [docs.fiscalapi.com.br](https://docs.fiscalapi.com.br).
 
 Coleção Postman e especificação OpenAPI 3.1 da [FiscalAPI](https://fiscalapi.com.br): Inscrição Estadual nos 27 estados, CNPJ, certidões (CND estadual, CND Federal, CNDT, CRF/FGTS), XML de NF-e por chave (com certificado, ou cópia para leitura sem certificado), XML de CT-e por chave (com certificado), Monitor de NF-e por chave (aviso por webhook quando a nota é cancelada ou recebe evento), emissão de NFS-e Nacional (com o certificado A1 da empresa), DIFAL de saída por UF de destino (Beta, com o certificado do emitente), NFS-e por chave, Simples Nacional, SIGEF, CNIR e perfil do produtor rural.
 
